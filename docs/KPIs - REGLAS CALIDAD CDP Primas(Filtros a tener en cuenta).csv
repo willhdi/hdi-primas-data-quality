@@ -1,0 +1,6 @@
+Fuente ,Campo,Lógica
+gde_adp_dwh_vw_general.vw_fact_policy_transaction_movement,source_system,"source_system in ('CO_iaxis', 'CO_as400')"
+gde_adp_dwh_vw_general.vw_fact_policy_transaction_movement,receipt_type,receipt_type <> 'unificado-total'
+gde_adp_dwh_vw_general.vw_fact_policy_transaction_movement,current_record_flag,current_record_flag = 1
+gde_adp_dwh_vw_general.vw_fact_policy_transaction_movement,transaction_delta_billed_premium_amount,transaction_delta_billed_premium_amount <> 0
+gde_adp_dwh_vw_general.vw_fact_policy_transaction_movement,coverage_code,coverage_code <> 8888
