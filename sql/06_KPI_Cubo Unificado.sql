@@ -9,7 +9,7 @@
 --
 -- Los 5 archivos originales NO se tocan ni se borran en este cambio — se
 -- dejan como respaldo/referencia hasta que se confirme que este cubo los
--- reemplaza en Power BI.
+-- reemplaza en Power BI. 
 --
 -- Cambio de comportamiento a propósito vs. el archivo original de Exactitud:
 -- aquí Exactitud SÍ aplica el filtro compartido completo (incluye
