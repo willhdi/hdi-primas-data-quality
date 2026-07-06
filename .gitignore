@@ -7,3 +7,6 @@ credenciales_local.py
 # Bytecode de Python (puede contener credenciales compiladas)
 __pycache__/
 *.pyc
+
+# Config local de Claude Code
+.claude/settings.local.json

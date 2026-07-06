@@ -1,11 +1,10 @@
-,,,,,,,,2,4,3,2,5,,,,,
-base,schema_name,table_name,table_type,column_name,data_type,constraint_type,owner,completitud,unicidad,exactitud,validez,integridad,Disponibilidad,Lógica Completitud,Lógica Unicidad,Lógica Exactitud,Lógica Validez
+base,schema_name,table_name,table_type,column_name,data_type,constraint_type,owner,completitud,unicidad,exactitud,validez,integridad,Disponibilidad,Lï¿½gica Completitud,Lï¿½gica Unicidad,Lï¿½gica Exactitud,Lï¿½gica Validez
 PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,sseguro,varchar,,adp_db_admin,El campo no puede estar vacio si su fuente es iaxis pero si es as400 si puede estar vacio.,,,,,,CASE WHEN sseguro IS NULL AND source_system <> 'CO_as400' THEN 1 ELSE 0 END,,,
-PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,policy_transaction_movement_sk,int8,PRIMARY KEY,adp_db_admin,No puede ser vacío,Este campo debe ser único,,,,"Si la cuenta es = 0 entonces está sincronizada, si es > 0 entonces no se ha terminado de hacer el refresh y hay N filas faltantes en la vista. Esto aplicando la regla 4 también en donde por cada ramo debe tener registros en cada unoi de los días del 1 al 15, si falta al menos un día entonces falla.",CASE WHEN policy_transaction_movement_sk IS NULL THEN 1 ELSE 0 END,"SELECT policy_transaction_movement_sk
+PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,policy_transaction_movement_sk,int8,PRIMARY KEY,adp_db_admin,No puede ser vacï¿½o,Este campo debe ser ï¿½nico,,,,"Si la cuenta es = 0 entonces estï¿½ sincronizada, si es > 0 entonces no se ha terminado de hacer el refresh y hay N filas faltantes en la vista. Esto aplicando la regla 4 tambiï¿½n en donde por cada ramo debe tener registros en cada unoi de los dï¿½as del 1 al 15, si falta al menos un dï¿½a entonces falla.",CASE WHEN policy_transaction_movement_sk IS NULL THEN 1 ELSE 0 END,"SELECT policy_transaction_movement_sk
     FROM base
     GROUP BY policy_transaction_movement_sk
     HAVING COUNT(*) > 1",,
-PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,source_system,varchar,,adp_db_admin,No puede ser vacío,,Debe contener solo CO_iaxis y CO_as400,No debe ser de tipo 'Unknown',,,CASE WHEN source_system IS NULL THEN 1 ELSE 0 END,,"SELECT
+PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,source_system,varchar,,adp_db_admin,No puede ser vacï¿½o,,Debe contener solo CO_iaxis y CO_as400,No debe ser de tipo 'Unknown',,,CASE WHEN source_system IS NULL THEN 1 ELSE 0 END,,"SELECT
     p_periodo AS periodo_contable,
     'source_system' AS nombre_campo,
     COUNT(*) AS total_registros,
@@ -21,59 +20,59 @@ PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,source_sys
 				OR source_system = 'Unknown'
 		 THEN 1 ELSE 0 END) AS n_source_system"
 PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,customer_sk,int8,,adp_db_admin,,,,,,,,,,
-PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,accountable_period,int4,,adp_db_admin,No puede ser vacío,,,YYYYMM,,,CASE WHEN accountable_period IS NULL THEN 1 ELSE 0 END,,,"SUM(
+PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,accountable_period,int4,,adp_db_admin,No puede ser vacï¿½o,,,YYYYMM,,,CASE WHEN accountable_period IS NULL THEN 1 ELSE 0 END,,,"SUM(
 			CASE
 				WHEN accountable_period IS NULL
 				OR LENGTH(accountable_period::VARCHAR) <> 6
 			THEN 1 ELSE 0 END
 			) AS n_accountable_period"
 PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,insured_sk,int8,,adp_db_admin,,,,,,,,,,
-PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,coverage_code,varchar,,adp_db_admin,No puede ser vacío,,,No debe ser de tipo 'Unknown',,,CASE WHEN coverage_code IS NULL THEN 1 ELSE 0 END,,,"SUM(CASE WHEN coverage_code IS NULL
+PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,coverage_code,varchar,,adp_db_admin,No puede ser vacï¿½o,,,No debe ser de tipo 'Unknown',,,CASE WHEN coverage_code IS NULL THEN 1 ELSE 0 END,,,"SUM(CASE WHEN coverage_code IS NULL
 				OR coverage_code = 'Unknown'
 		 THEN 1 ELSE 0 END) AS n_coverage_code"
-PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,branch_sk,int8,,adp_db_admin,No puede ser vacío,,,,,,CASE WHEN branch_sk IS NULL THEN 1 ELSE 0 END,,,
-PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,product_code,varchar,,adp_db_admin,No puede ser vacío,,,"not in (Unknown), varchar6 , sin caracteres especiales, sin espacios, solo los ramos de CO-as400 tienen letras, los demas son numeros",,,CASE WHEN product_code IS NULL THEN 1 ELSE 0 END,,,"SUM(CASE WHEN product_code IS NULL
+PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,branch_sk,int8,,adp_db_admin,No puede ser vacï¿½o,,,,,,CASE WHEN branch_sk IS NULL THEN 1 ELSE 0 END,,,
+PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,product_code,varchar,,adp_db_admin,No puede ser vacï¿½o,,,"not in (Unknown), varchar6 , sin caracteres especiales, sin espacios, solo los ramos de CO-as400 tienen letras, los demas son numeros",,,CASE WHEN product_code IS NULL THEN 1 ELSE 0 END,,,"SUM(CASE WHEN product_code IS NULL
 				OR product_code = 'Unknown'
-				OR LENGTH(product_code) > 6 -- válido hasta 6 dígitos 
+				OR LENGTH(product_code) > 6 -- vï¿½lido hasta 6 dï¿½gitos 
 				OR product_code LIKE '% %'
 				OR product_code ~ '[^A-Za-z0-9]'
-				OR (source_system = 'CO_iaxis' -- para as400 se permiten letras y para IAXIS solo números
+				OR (source_system = 'CO_iaxis' -- para as400 se permiten letras y para IAXIS solo nï¿½meros
 					AND product_code ~ '[A-Za-z]') 
 		 THEN 1 ELSE 0 END) AS n_product_code"
-PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,transaction_date_sk,int8,,adp_db_admin,No puede ser vacío,,,YYYYMMDD,,,CASE WHEN transaction_date_sk IS NULL THEN 1 ELSE 0 END,,,"SUM(CASE WHEN transaction_date_sk IS NULL
+PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,transaction_date_sk,int8,,adp_db_admin,No puede ser vacï¿½o,,,YYYYMMDD,,,CASE WHEN transaction_date_sk IS NULL THEN 1 ELSE 0 END,,,"SUM(CASE WHEN transaction_date_sk IS NULL
 				OR transaction_date_sk:: VARCHAR !~ '^[0-9]{8}$'
 		 THEN 1 ELSE 0 END) AS n_transaction_date_sk"
-PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,policy_effective_date_sk,int8,,adp_db_admin,No puede ser vacío,,,YYYYMMDD,,,CASE WHEN policy_effective_date_sk IS NULL THEN 1 ELSE 0 END,,,"SUM(
+PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,policy_effective_date_sk,int8,,adp_db_admin,No puede ser vacï¿½o,,,YYYYMMDD,,,CASE WHEN policy_effective_date_sk IS NULL THEN 1 ELSE 0 END,,,"SUM(
 			CASE
 				WHEN policy_effective_date_sk IS NULL
 				OR LENGTH(policy_effective_date_sk::VARCHAR) <> 8
 			THEN 1 ELSE 0 END
 			) AS n_policy_effective_date_sk"
-PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,policy_expiration_date_sk,int8,,adp_db_admin,No puede ser vacío,,,YYYYMMDD,,,CASE WHEN policy_expiration_date_sk IS NULL THEN 1 ELSE 0 END,,,"SUM(
+PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,policy_expiration_date_sk,int8,,adp_db_admin,No puede ser vacï¿½o,,,YYYYMMDD,,,CASE WHEN policy_expiration_date_sk IS NULL THEN 1 ELSE 0 END,,,"SUM(
 			CASE
 				WHEN policy_expiration_date_sk IS NULL
 				OR LENGTH(policy_expiration_date_sk::VARCHAR) <> 8
 			THEN 1 ELSE 0 END
 			) AS n_policy_expiration_date_sk"
-PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,inception_date_sk,int8,,adp_db_admin,No puede ser vacío,,,YYYYMMDD,,,CASE WHEN inception_date_sk IS NULL THEN 1 ELSE 0 END,,,"SUM(
+PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,inception_date_sk,int8,,adp_db_admin,No puede ser vacï¿½o,,,YYYYMMDD,,,CASE WHEN inception_date_sk IS NULL THEN 1 ELSE 0 END,,,"SUM(
 			CASE
 				WHEN inception_date_sk IS NULL
 				OR LENGTH(inception_date_sk::VARCHAR) <> 8
 			THEN 1 ELSE 0 END
 			) AS n_inception_date_sk"
-PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,transaction_type,varchar,,adp_db_admin,No puede ser vacío,,,No debe ser de tipo 'Unknown' y debe ser un valor tipo Varchar 2.,,,CASE WHEN transaction_type IS NULL THEN 1 ELSE 0 END,,,"SUM(CASE WHEN transaction_type IS NULL
+PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,transaction_type,varchar,,adp_db_admin,No puede ser vacï¿½o,,,No debe ser de tipo 'Unknown' y debe ser un valor tipo Varchar 2.,,,CASE WHEN transaction_type IS NULL THEN 1 ELSE 0 END,,,"SUM(CASE WHEN transaction_type IS NULL
 				OR transaction_type = 'Unknown'
-				OR LENGTH(transaction_type) > 2 -- válido hasta 2 dígitos
+				OR LENGTH(transaction_type) > 2 -- vï¿½lido hasta 2 dï¿½gitos
 		 THEN 1 ELSE 0 END) AS n_transaction_type"
 PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,movement_type,varchar,,adp_db_admin,,,,,,,,,,
-PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,transaction_effective_date_sk,int8,,adp_db_admin,No puede ser vacío,,,Debe ser en formato 'YYYYMMDD',,,CASE WHEN transaction_effective_date_sk IS NULL THEN 1 ELSE 0 END,,,"SUM(
+PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,transaction_effective_date_sk,int8,,adp_db_admin,No puede ser vacï¿½o,,,Debe ser en formato 'YYYYMMDD',,,CASE WHEN transaction_effective_date_sk IS NULL THEN 1 ELSE 0 END,,,"SUM(
 			CASE
 				WHEN transaction_effective_date_sk IS NULL
 				OR LENGTH(transaction_effective_date_sk::VARCHAR) <> 8
 			THEN 1 ELSE 0 END
 			) AS n_transaction_effective_date_sk"
-PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,transaction_type_description,varchar,,adp_db_admin,No puede ser vacío,,,,,,CASE WHEN transaction_type_description IS NULL THEN 1 ELSE 0 END,,,
-PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,current_record_flag,varchar,,adp_db_admin,No puede ser vacío,,Debe contener solo valores 1 y 0, Solo son válidos los valores 1 y 0,,,CASE WHEN current_record_flag IS NULL THEN 1 ELSE 0 END,,"SELECT
+PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,transaction_type_description,varchar,,adp_db_admin,No puede ser vacï¿½o,,,,,,CASE WHEN transaction_type_description IS NULL THEN 1 ELSE 0 END,,,
+PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,current_record_flag,varchar,,adp_db_admin,No puede ser vacï¿½o,,Debe contener solo valores 1 y 0, Solo son vï¿½lidos los valores 1 y 0,,,CASE WHEN current_record_flag IS NULL THEN 1 ELSE 0 END,,"SELECT
     p_periodo,
     'current_record_flag',
     COUNT(*),
@@ -88,9 +87,9 @@ PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,current_re
     )","SUM(CASE WHEN current_record_flag IS NULL
 				OR current_record_flag NOT IN (0,1)
 		 THEN 1 ELSE 0 END) AS n_current_record_flag"
-PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,transaction_delta_billed_premium_amount,float8,,adp_db_admin,No puede ser vacío,,,,"Comparacion con tabla ODS, deben contener el mismo valor ",,CASE WHEN transaction_delta_billed_premium_amount IS NULL THEN 1 ELSE 0 END,,,
+PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,transaction_delta_billed_premium_amount,float8,,adp_db_admin,No puede ser vacï¿½o,,,,"Comparacion con tabla ODS, deben contener el mismo valor ",,CASE WHEN transaction_delta_billed_premium_amount IS NULL THEN 1 ELSE 0 END,,,
 PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,transaction_delta_base_premium_amount,float8,,adp_db_admin,,,,,"Comparacion con tabla ODS, deben contener el mismo valor ",,,,,
-PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,transaction_delta_commission_amount,float8,,adp_db_admin,No puede ser vacío,,,,"Comparacion con tabla ODS, deben contener el mismo valor ",,CASE WHEN transaction_delta_commission_amount IS NULL THEN 1 ELSE 0 END,,,
+PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,transaction_delta_commission_amount,float8,,adp_db_admin,No puede ser vacï¿½o,,,,"Comparacion con tabla ODS, deben contener el mismo valor ",,CASE WHEN transaction_delta_commission_amount IS NULL THEN 1 ELSE 0 END,,,
 PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,receipt_type,varchar,,adp_db_admin,el campo no puede estar vacio si su fuente es iaxis pero si es as400 si puede estar vacio.,,Debe contener solo los siguientes tipos de recibo: not-unificado  -  unificado-detail  -  unificado-total,,,,CASE WHEN receipt_type IS NULL AND source_system <> 'CO_as400' THEN 1 ELSE 0 END,,"SELECT
     p_periodo,
     'receipt_type',
@@ -119,10 +118,10 @@ PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,receipt_nu
 					AND receipt_number IS NOT NULL
 				)
 			THEN 1 ELSE 0 END ",,,
-PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,risk_number,varchar,,adp_db_admin,No puede ser vacío,,,No debe ser de tipo 'Unknown',,,CASE WHEN risk_number IS NULL THEN 1 ELSE 0 END,,,"SUM(CASE WHEN risk_number IS NULL
+PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,risk_number,varchar,,adp_db_admin,No puede ser vacï¿½o,,,No debe ser de tipo 'Unknown',,,CASE WHEN risk_number IS NULL THEN 1 ELSE 0 END,,,"SUM(CASE WHEN risk_number IS NULL
 				OR risk_number = 'Unknown' 
 		 THEN 1 ELSE 0 END) AS n_risk_number"
-PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,policy_number,varchar,,adp_db_admin,No puede ser vacío,,,No debe ser de tipo 'Unknown',,,CASE WHEN policy_number IS NULL THEN 1 ELSE 0 END,,,"SUM(CASE WHEN policy_number IS NULL
+PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,policy_number,varchar,,adp_db_admin,No puede ser vacï¿½o,,,No debe ser de tipo 'Unknown',,,CASE WHEN policy_number IS NULL THEN 1 ELSE 0 END,,,"SUM(CASE WHEN policy_number IS NULL
 				OR policy_number = 'Unknown'
 		 THEN 1 ELSE 0 END) AS n_policy_number"
-PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,transaction_delta_billed_premium_amount_raw,float8,,adp_db_admin,No puede ser vacío,,,,"Comparacion con tabla ODS, deben contener el mismo valor ",,CASE WHEN transaction_delta_billed_premium_amount_raw IS NULL THEN 1 ELSE 0 END,,,
+PROD,gde_adp_dwh_vw_general,vw_fact_policy_transaction_movement,TABLE,transaction_delta_billed_premium_amount_raw,float8,,adp_db_admin,No puede ser vacï¿½o,,,,"Comparacion con tabla ODS, deben contener el mismo valor ",,CASE WHEN transaction_delta_billed_premium_amount_raw IS NULL THEN 1 ELSE 0 END,,,

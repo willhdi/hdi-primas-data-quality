@@ -1,0 +1,3 @@
+select *
+from gde_adp_dwh_vw_general.vw_fact_policy_transaction_movement
+limit 10;
