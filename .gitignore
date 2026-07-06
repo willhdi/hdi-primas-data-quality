@@ -1,1 +1,9 @@
 CLAUDE.md
+
+# Credenciales locales — nunca subir al repo
+notebooks/credenciales_local.py
+credenciales_local.py
+
+# Bytecode de Python (puede contener credenciales compiladas)
+__pycache__/
+*.pyc
