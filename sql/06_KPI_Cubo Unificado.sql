@@ -139,7 +139,7 @@ SELECT
     'completitud',
     'TOTAL_PERIODO',
     MAX(total_registros),
-    NULL,
+    SUM(cantidad_mala),
     ROUND(AVG(porcentaje), 2),
     1,
     GETDATE()
@@ -337,7 +337,7 @@ SELECT
     'validez',
     'TOTAL_PERIODO',
     MAX(total_registros),
-    NULL,
+    SUM(cantidad_mala),
     ROUND(AVG(porcentaje), 2),
     1,
     GETDATE()
