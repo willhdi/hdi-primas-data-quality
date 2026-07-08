@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(python -c ' *)"
+      "Bash(python -c ' *)",
+      "Bash(git commit -m ' *)",
+      "Bash(python -m nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=600 cubo_unificado_runner.ipynb)"
     ]
   }
 }
