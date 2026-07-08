@@ -1,0 +1,21 @@
+{
+  "name": "HDI Calidad de Datos",
+  "dataColors": ["#2a78d6", "#eda100", "#4a3aa7", "#eb6834", "#0f7a3c", "#8dc63f"],
+  "background": "#fcfcfb",
+  "foreground": "#0b0b0b",
+  "tableAccent": "#0f7a3c",
+  "good": "#0ca30c",
+  "neutral": "#fab219",
+  "bad": "#d03b3b",
+  "maximum": "#0ca30c",
+  "center": "#fab219",
+  "minimum": "#d03b3b",
+  "visualStyles": {
+    "*": {
+      "*": {
+        "background": [{ "color": { "solid": { "color": "#fcfcfb" } } }],
+        "border": [{ "color": { "solid": { "color": "#e1e0d9" } }, "show": true }]
+      }
+    }
+  }
+}
