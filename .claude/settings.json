@@ -3,7 +3,10 @@
     "allow": [
       "Bash(python -c ' *)",
       "Bash(git commit -m ' *)",
-      "Bash(python -m nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=600 cubo_unificado_runner.ipynb)"
+      "Bash(python -m nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=600 cubo_unificado_runner.ipynb)",
+      "Bash(PYTHONIOENCODING=utf-8 python -c ' *)",
+      "Bash(PYTHONIOENCODING=utf-8 python \"C:/Users/WILSON~1.JER/AppData/Local/Temp/claude/c--Users-Wilson-Jerez-OneDrive---HDI-Seguros-Documentos-hdi-primas-data-quality/8c5ea483-edf0-4daa-8307-fb92aec8a2c0/scratchpad/patch_nb_cubo.py\")",
+      "Bash(PYTHONIOENCODING=utf-8 python \"C:/Users/WILSON~1.JER/AppData/Local/Temp/claude/c--Users-Wilson-Jerez-OneDrive---HDI-Seguros-Documentos-hdi-primas-data-quality/8c5ea483-edf0-4daa-8307-fb92aec8a2c0/scratchpad/regen_html_cubo.py\")"
     ]
   }
 }

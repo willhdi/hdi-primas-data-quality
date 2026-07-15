@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calidad de Datos — Clientes SARLAFT / PEP</title>
+<style>
+  :root{
+    /* Marca HDI (cromo del tablero, no codifica datos) */
+    --brand:#0f7a3c; --brand-2:#8dc63f; --brand-soft:rgba(15,122,60,.10);
+    --surface:#fcfcfb; --page:#f4f4f1;
+    --ink:#0b0b0b; --ink-2:#52514e; --muted:#898781;
+    --grid:#e1e0d9; --border:rgba(11,11,11,.10); --track:#ecebe5;
+    --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --critical:#d03b3b;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --brand:#2fae62; --brand-2:#8dc63f; --brand-soft:rgba(47,174,98,.14);
+      --surface:#1a1a19; --page:#0d0d0d;
+      --ink:#ffffff; --ink-2:#c3c2b7;
+      --grid:#2c2c2a; --border:rgba(255,255,255,.10); --track:#2c2c2a;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--page);color:var(--ink);
+       font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+  .wrap{max-width:1240px;margin:0 auto;padding:20px 24px 56px}
+  .hdr{display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+       background:var(--surface);border:1px solid var(--border);border-radius:12px;
+       padding:14px 20px;margin-bottom:14px}
+  .brand{display:flex;align-items:center;gap:10px}
+  .bt b{display:block;font-size:19px;letter-spacing:.02em;color:var(--brand);line-height:1}
+  .bt span{font-size:9.5px;letter-spacing:.28em;color:var(--ink-2)}
+  .ttl{flex:1;min-width:260px;text-align:center}
+  .ttl h1{font-size:21px;font-weight:700;color:var(--brand);margin:0}
+  .ttl .sub{color:var(--muted);font-size:12px;margin:3px 0 0}
+  section{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+          padding:18px 20px;margin-bottom:14px}
+  section h2{font-size:15px;font-weight:650;margin:0 0 2px}
+  section .nota{font-size:12.5px;color:var(--ink-2);margin:0 0 12px}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:14px}
+  .tile{background:var(--surface);border:1px dashed var(--border);border-radius:12px;padding:12px 14px}
+  .tile .lbl{font-size:12px;color:var(--ink-2)}
+  .tile .val{font-size:24px;font-weight:600;margin:2px 0}
+  .tile .desc{font-size:11px;color:var(--muted)}
+  .gauges{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+  .gauge{flex:1;min-width:158px;background:var(--surface);border:1px solid var(--border);
+         border-radius:12px;padding:14px 10px;text-align:center}
+  .gauge.dq{border-color:var(--brand);background:var(--brand-soft)}
+  .gauge .glbl{font-size:12.5px;color:var(--ink-2);margin-bottom:8px;min-height:30px}
+  .glbl[data-tip]{cursor:help;text-decoration:underline dotted;
+     text-decoration-color:var(--ink-2);text-underline-offset:3px}
+  .chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;
+        padding:2px 9px;border-radius:999px;white-space:nowrap;
+        background:color-mix(in srgb, var(--c) 14%, transparent)}
+  .chip .ico{color:var(--c);font-size:11px}
+  .twrap{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-size:13px}
+  th{color:var(--muted);font-weight:500;text-align:left;font-size:12px;
+     padding:6px 10px;border-bottom:1px solid var(--grid);white-space:nowrap}
+  th.num{text-align:right}
+  td{padding:7px 10px;border-bottom:1px solid var(--grid)}
+  tr:last-child td{border-bottom:none}
+  td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  td.campo{font-family:ui-monospace,Consolas,monospace;font-size:12.5px}
+  table.verde thead th{background:var(--brand);color:#fff;font-weight:600;border-bottom:none}
+  table.verde thead th:first-child{border-radius:8px 0 0 8px}
+  table.verde thead th:last-child{border-radius:0 8px 8px 0}
+  .track{height:8px;background:var(--track);border-radius:4px;min-width:100px}
+  .fill{height:100%;background:var(--brand);border-radius:4px}
+  td.campo[data-tip], th[data-tip]{cursor:help;text-decoration:underline dotted;
+     text-decoration-color:var(--ink-2);text-underline-offset:3px}
+  table.verde thead th[data-tip]{text-decoration-color:#fff}
+  svg text.big{fill:var(--ink);font-weight:600;font-family:inherit}
+  #tip{position:fixed;display:none;z-index:10;pointer-events:none;max-width:300px;
+       background:var(--ink);color:var(--surface);font-size:12px;line-height:1.4;
+       padding:6px 10px;border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+  .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:14px;align-items:start}
+  .info-grid h3{font-size:13.5px;color:var(--brand);margin:14px 0 4px}
+  .info-grid h3:first-child{margin-top:0}
+  .info-grid p, .info-grid li{font-size:12.5px;color:var(--ink-2)}
+  .info-grid ul{margin:4px 0;padding-left:18px}
+  .kv{font-size:12.5px;color:var(--ink-2)}
+  .kv b{color:var(--ink)}
+  .gauge{cursor:pointer}
+  .gauge:hover{border-color:var(--brand)}
+  .gauge .hint{font-size:10.5px;color:var(--muted);margin-top:6px}
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;z-index:20;
+            align-items:flex-start;justify-content:center;padding:4vh 16px;overflow-y:auto}
+  .modal-bg.open{display:flex}
+  .modal{background:var(--surface);color:var(--ink);border:1px solid var(--border);
+         border-radius:14px;max-width:880px;width:100%;padding:20px 24px;
+         box-shadow:0 12px 40px rgba(0,0,0,.35);max-height:92vh;overflow-y:auto}
+  .modal .mhead{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+  .modal .mhead h2{font-size:17px;margin:0;color:var(--brand)}
+  .modal .cerrar{margin-left:auto;background:none;border:1px solid var(--border);
+                 color:var(--ink-2);border-radius:8px;font-size:13px;padding:4px 10px;cursor:pointer}
+  .modal .cerrar:hover{color:var(--ink);border-color:var(--ink-2)}
+  .modal h3{font-size:13.5px;color:var(--brand);margin:16px 0 6px}
+  .modal p{font-size:12.5px;color:var(--ink-2);margin:4px 0}
+  .modal details{border:1px solid var(--border);border-radius:10px;padding:8px 12px;margin:8px 0}
+  .modal summary{cursor:pointer;font-size:13px}
+  .modal summary .campo{font-family:ui-monospace,Consolas,monospace;font-weight:600}
+  pre.sql{background:var(--page);border:1px solid var(--grid);border-radius:8px;
+          padding:10px 12px;font:12px/1.5 ui-monospace,Consolas,monospace;
+          overflow-x:auto;white-space:pre;color:var(--ink);margin:6px 0 2px}
+  footer{color:var(--muted);font-size:11.5px;margin-top:18px;text-align:center}
+</style>
+</head>
+<body>
+<div id="tip"></div>
+<div class="modal-bg" id="modalBg"><div class="modal" id="modal" role="dialog" aria-modal="true"></div></div>
+<div class="wrap">
+  <header class="hdr">
+    <div class="brand">
+      <svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true">
+        <rect x="3"  y="12" width="12" height="12" fill="var(--brand-2)"/>
+        <rect x="15" y="2"  width="9"  height="9"  fill="var(--brand)"/>
+        <rect x="21" y="14" width="12" height="12" fill="var(--brand)"/>
+        <rect x="12" y="25" width="8"  height="8"  fill="var(--brand-2)"/>
+      </svg>
+      <div class="bt"><b>HDI</b><span>SEGUROS</span></div>
+    </div>
+    <div class="ttl">
+      <h1>Calidad de Datos — Clientes SARLAFT / PEP</h1>
+      <p class="sub" id="sub"></p>
+    </div>
+  </header>
+  <div class="tiles" id="tiles"></div>
+  <div class="gauges" id="gauges"></div>
+  <div id="tablas"></div>
+  <section>
+    <h2>Prioridades de remediación</h2>
+    <p class="nota">Celdas atributo × dimensión por debajo del umbral de <span id="lblTarget"></span> %, ordenadas de peor a mejor: lo primero de la lista es lo primero a remediar.</p>
+    <div id="ranking"></div>
+  </section>
+  <section>
+    <h2>Información del reporte</h2>
+    <div class="info-grid" id="info"></div>
+  </section>
+  <footer id="pie"></footer>
+</div>
+<script>
+const DATA = {"generado": "2026-07-15 07:16", "periodo": "202606", "tabla_pep": "clientes_pirani_202606", "umbrales": {"default": {"BUENO": 90.0, "ALERTA": 75.0, "GRAVE": 50.0}}, "target": 90.0, "sarlaft_disponible": false, "diccionario": {"numero_documento": "Número de identificación del cliente. Se toma con prioridad SCT → Formulario SARLAFT → iAxis → AS400.", "nombres_completos": "Nombre o razón social del cliente (nombres y apellidos concatenados de la mejor fuente disponible).", "fecha_nacimiento": "Fecha de nacimiento del cliente (SARLAFT → iAxis → AS400).", "fecha_vinculacion": "Fecha de alta/vinculación del cliente en iAxis (campo falta).", "celular": "Teléfono celular de contacto (SCT → SARLAFT → contactos iAxis → AS400).", "correo_electronico": "Correo electrónico de contacto (SCT → SARLAFT → contactos iAxis → AS400).", "total_activos": "Total de activos declarados. Solo se evalúa sobre clientes que declaran SARLAFT.", "total_pasivos": "Total de pasivos declarados. Solo se evalúa sobre clientes que declaran SARLAFT.", "total_ingresos": "Total de ingresos declarados. Solo se evalúa sobre clientes que declaran SARLAFT.", "total_egresos": "Total de egresos declarados. Solo se evalúa sobre clientes que declaran SARLAFT."}, "metricas": [{"tipo_persona": 1, "desc_tipo_persona": "Persona natural", "atributo": "celular", "pct_completitud": 98.82, "pct_validez": 97.89, "pct_unicidad": null, "pct_precision": null, "pct_oportunidad": 33.35, "cumple_completitud_90": 1, "cumple_validez_90": 1, "cumple_unicidad_90": 0, "cumple_precision_90": 0, "cumple_oportunidad_90": 0}, {"tipo_persona": 1, "desc_tipo_persona": "Persona natural", "atributo": "correo_electronico", "pct_completitud": 98.27, "pct_validez": 98.24, "pct_unicidad": null, "pct_precision": null, "pct_oportunidad": 33.55, "cumple_completitud_90": 1, "cumple_validez_90": 1, "cumple_unicidad_90": 0, "cumple_precision_90": 0, "cumple_oportunidad_90": 0}, {"tipo_persona": 1, "desc_tipo_persona": "Persona natural", "atributo": "fecha_nacimiento", "pct_completitud": 94.8, "pct_validez": 92.22, "pct_unicidad": null, "pct_precision": null, "pct_oportunidad": 31.14, "cumple_completitud_90": 1, "cumple_validez_90": 1, "cumple_unicidad_90": 0, "cumple_precision_90": 0, "cumple_oportunidad_90": 0}, {"tipo_persona": 1, "desc_tipo_persona": "Persona natural", "atributo": "fecha_vinculacion", "pct_completitud": 100.0, "pct_validez": 99.99, "pct_unicidad": null, "pct_precision": null, "pct_oportunidad": 31.7, "cumple_completitud_90": 1, "cumple_validez_90": 1, "cumple_unicidad_90": 0, "cumple_precision_90": 0, "cumple_oportunidad_90": 0}, {"tipo_persona": 1, "desc_tipo_persona": "Persona natural", "atributo": "nombres_completos", "pct_completitud": 100.0, "pct_validez": 98.6, "pct_unicidad": null, "pct_precision": null, "pct_oportunidad": 34.05, "cumple_completitud_90": 1, "cumple_validez_90": 1, "cumple_unicidad_90": 0, "cumple_precision_90": 0, "cumple_oportunidad_90": 0}, {"tipo_persona": 1, "desc_tipo_persona": "Persona natural", "atributo": "numero_documento", "pct_completitud": 100.0, "pct_validez": 100.0, "pct_unicidad": 99.92, "pct_precision": null, "pct_oportunidad": 30.87, "cumple_completitud_90": 1, "cumple_validez_90": 1, "cumple_unicidad_90": 1, "cumple_precision_90": 0, "cumple_oportunidad_90": 0}, {"tipo_persona": 2, "desc_tipo_persona": "Persona juridica", "atributo": "celular", "pct_completitud": 93.03, "pct_validez": 86.86, "pct_unicidad": null, "pct_precision": null, "pct_oportunidad": 33.11, "cumple_completitud_90": 1, "cumple_validez_90": 0, "cumple_unicidad_90": 0, "cumple_precision_90": 0, "cumple_oportunidad_90": 0}, {"tipo_persona": 2, "desc_tipo_persona": "Persona juridica", "atributo": "correo_electronico", "pct_completitud": 91.45, "pct_validez": 91.36, "pct_unicidad": null, "pct_precision": null, "pct_oportunidad": 29.74, "cumple_completitud_90": 1, "cumple_validez_90": 1, "cumple_unicidad_90": 0, "cumple_precision_90": 0, "cumple_oportunidad_90": 0}, {"tipo_persona": 2, "desc_tipo_persona": "Persona juridica", "atributo": "fecha_nacimiento", "pct_completitud": 81.99, "pct_validez": 72.04, "pct_unicidad": null, "pct_precision": null, "pct_oportunidad": 26.69, "cumple_completitud_90": 0, "cumple_validez_90": 0, "cumple_unicidad_90": 0, "cumple_precision_90": 0, "cumple_oportunidad_90": 0}, {"tipo_persona": 2, "desc_tipo_persona": "Persona juridica", "atributo": "fecha_vinculacion", "pct_completitud": 100.0, "pct_validez": 99.33, "pct_unicidad": null, "pct_precision": null, "pct_oportunidad": 28.06, "cumple_completitud_90": 1, "cumple_validez_90": 1, "cumple_unicidad_90": 0, "cumple_precision_90": 0, "cumple_oportunidad_90": 0}, {"tipo_persona": 2, "desc_tipo_persona": "Persona juridica", "atributo": "nombres_completos", "pct_completitud": 100.0, "pct_validez": 69.56, "pct_unicidad": null, "pct_precision": null, "pct_oportunidad": 37.88, "cumple_completitud_90": 1, "cumple_validez_90": 0, "cumple_unicidad_90": 0, "cumple_precision_90": 0, "cumple_oportunidad_90": 0}, {"tipo_persona": 2, "desc_tipo_persona": "Persona juridica", "atributo": "numero_documento", "pct_completitud": 100.0, "pct_validez": 100.0, "pct_unicidad": 97.52, "pct_precision": null, "pct_oportunidad": 28.03, "cumple_completitud_90": 1, "cumple_validez_90": 1, "cumple_unicidad_90": 1, "cumple_precision_90": 0, "cumple_oportunidad_90": 0}], "resumen": [{"tipo_persona": 1.0, "total_clientes": 229053, "declaran_sarlaft": 0, "intensificado": 227400, "obligado": 0, "ordinario": 1653}, {"tipo_persona": 2.0, "total_clientes": 28173, "declaran_sarlaft": 0, "intensificado": 28009, "obligado": 0, "ordinario": 164}, {"tipo_persona": null, "total_clientes": 35, "declaran_sarlaft": 0, "intensificado": 0, "obligado": 0, "ordinario": 35}], "reglas": {"pct_completitud": {"titulo": "Completitud", "explicacion": "Mide si el dato está presente. Por cada cliente la regla vale 1 cuando el atributo tiene valor (no nulo y no cadena vacía) y 0 cuando falta. El porcentaje del anillo es el promedio de todas las reglas de completitud sobre la población: AVG(regla) * 100.", "poblacion": "Todos los clientes PN/PJ del periodo; los atributos financieros (activos, pasivos, ingresos, egresos) solo se evalúan sobre clientes que declaran SARLAFT.", "reglas": {"numero_documento": {"que_hace": "El número de documento existe y no es una cadena vacía.", "sql": "CASE WHEN rb.numero_documento IS NOT NULL AND BTRIM(rb.numero_documento) <> ''\n  THEN 1 ELSE 0 END AS rg_completitud_numero_documento"}, "nombres_completos": {"que_hace": "El nombre o razón social existe y no es una cadena vacía.", "sql": "CASE WHEN rb.nombres_completos IS NOT NULL AND BTRIM(rb.nombres_completos) <> ''\n  THEN 1 ELSE 0 END AS rg_completitud_nombres"}, "fecha_nacimiento": {"que_hace": "La fecha de nacimiento del cliente está informada (no nula).", "sql": "CASE WHEN rb.fecha_nacimiento IS NOT NULL THEN 1 ELSE 0 END AS rg_completitud_fecha_nacimiento"}, "fecha_vinculacion": {"que_hace": "La fecha de vinculación (alta en iAxis, campo falta) está informada.", "sql": "CASE WHEN rb.fecha_vinculacion IS NOT NULL THEN 1 ELSE 0 END AS rg_completitud_fecha_vinculacion"}, "celular": {"que_hace": "El teléfono celular de contacto existe y no es una cadena vacía.", "sql": "CASE WHEN rb.celular IS NOT NULL AND BTRIM(rb.celular) <> ''\n  THEN 1 ELSE 0 END AS rg_completitud_celular"}, "correo_electronico": {"que_hace": "El correo electrónico de contacto existe y no es una cadena vacía.", "sql": "CASE WHEN rb.correo_electronico IS NOT NULL AND BTRIM(rb.correo_electronico) <> ''\n  THEN 1 ELSE 0 END AS rg_completitud_correo"}, "total_activos": {"que_hace": "El total de activos declarados está informado (solo clientes que declaran SARLAFT).", "sql": "CASE WHEN rb.total_activos IS NOT NULL THEN 1 ELSE 0 END AS rg_completitud_activos"}, "total_pasivos": {"que_hace": "El total de pasivos declarados está informado (solo clientes que declaran SARLAFT).", "sql": "CASE WHEN rb.total_pasivos IS NOT NULL THEN 1 ELSE 0 END AS rg_completitud_pasivos"}, "total_ingresos": {"que_hace": "El total de ingresos declarados está informado (solo clientes que declaran SARLAFT).", "sql": "CASE WHEN rb.total_ingresos IS NOT NULL THEN 1 ELSE 0 END AS rg_completitud_ingresos"}, "total_egresos": {"que_hace": "El total de egresos declarados está informado (solo clientes que declaran SARLAFT).", "sql": "CASE WHEN rb.total_egresos IS NOT NULL THEN 1 ELSE 0 END AS rg_completitud_egresos"}}}, "pct_validez": {"titulo": "Validez", "explicacion": "Mide si el dato, además de existir, cumple su formato o regla de negocio (estructura de correo, celular de 10 dígitos, nombres solo con letras, fechas coherentes, montos no negativos). La regla vale 1 si cumple y 0 si no; el anillo es el promedio AVG(regla) * 100.", "poblacion": "Todos los clientes PN/PJ del periodo; los atributos financieros solo sobre clientes que declaran SARLAFT. Un dato faltante también cuenta como inválido (regla = 0).", "reglas": {"numero_documento": {"que_hace": "El número de documento existe, no está vacío y no contiene espacios.", "sql": "CASE\n    WHEN rb.numero_documento IS NOT NULL\n     AND BTRIM(rb.numero_documento) <> ''\n     AND POSITION(' ' IN rb.numero_documento) = 0\n    THEN 1 ELSE 0\nEND AS rg_validez_numero_documento"}, "nombres_completos": {"que_hace": "El nombre contiene únicamente letras (incluidas tildes y Ñ) y espacios; sin números ni caracteres especiales. Por eso las razones sociales de persona jurídica con puntos, & o números bajan este indicador.", "sql": "CASE\n    WHEN rb.nombres_completos IS NOT NULL\n     AND BTRIM(rb.nombres_completos) <> ''\n     AND REGEXP_INSTR(rb.nombres_completos, '^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$') = 1\n    THEN 1 ELSE 0\nEND AS rg_validez_nombres"}, "fecha_nacimiento": {"que_hace": "La fecha de nacimiento existe, no es futura y no es anterior al 1 de enero de 1940.", "sql": "CASE\n    WHEN rb.fecha_nacimiento IS NULL THEN 0\n    WHEN rb.fecha_nacimiento > CURRENT_DATE THEN 0\n    WHEN rb.fecha_nacimiento < DATE '1940-01-01' THEN 0\n    ELSE 1\nEND AS rg_validez_fecha_nacimiento"}, "fecha_vinculacion": {"que_hace": "La fecha de vinculación existe, no es futura y no es anterior a la fecha de nacimiento del cliente (cuando esta se conoce).", "sql": "CASE\n    WHEN rb.fecha_vinculacion IS NULL THEN 0\n    WHEN rb.fecha_vinculacion > CURRENT_DATE THEN 0\n    WHEN rb.fecha_nacimiento IS NOT NULL AND rb.fecha_vinculacion < rb.fecha_nacimiento THEN 0\n    ELSE 1\nEND AS rg_validez_fecha_vinculacion"}, "celular": {"que_hace": "Tras eliminar todo lo que no sea dígito, el celular queda con exactamente 10 dígitos.", "sql": "CASE\n    WHEN rb.celular IS NOT NULL\n     AND REGEXP_INSTR(REGEXP_REPLACE(rb.celular, '[^0-9]', ''), '^[0-9]{10}$') = 1\n    THEN 1 ELSE 0\nEND AS rg_validez_celular"}, "correo_electronico": {"que_hace": "El correo tiene estructura válida usuario@dominio.extensión (extensión de al menos 2 letras), evaluado en minúsculas y sin espacios.", "sql": "CASE\n    WHEN rb.correo_electronico IS NOT NULL\n     AND REGEXP_INSTR(\n            LOWER(BTRIM(rb.correo_electronico)),\n            '^[a-z0-9._%+\\-]+@[a-z0-9.\\-]+\\.[a-z]{2,}$'\n         ) = 1\n    THEN 1 ELSE 0\nEND AS rg_validez_correo"}, "total_activos": {"que_hace": "El total de activos está informado y no es negativo.", "sql": "CASE WHEN rb.total_activos IS NOT NULL AND rb.total_activos >= 0\n  THEN 1 ELSE 0 END AS rg_validez_activos"}, "total_pasivos": {"que_hace": "El total de pasivos está informado y no es negativo.", "sql": "CASE WHEN rb.total_pasivos IS NOT NULL AND rb.total_pasivos >= 0\n  THEN 1 ELSE 0 END AS rg_validez_pasivos"}, "total_ingresos": {"que_hace": "El total de ingresos está informado y no es negativo.", "sql": "CASE WHEN rb.total_ingresos IS NOT NULL AND rb.total_ingresos >= 0\n  THEN 1 ELSE 0 END AS rg_validez_ingresos"}, "total_egresos": {"que_hace": "El total de egresos está informado y no es negativo.", "sql": "CASE WHEN rb.total_egresos IS NOT NULL AND rb.total_egresos >= 0\n  THEN 1 ELSE 0 END AS rg_validez_egresos"}}}, "pct_unicidad": {"titulo": "Unicidad", "explicacion": "Mide que no existan clientes duplicados: la regla vale 1 cuando la combinación tipo de documento + número de documento aparece una sola vez en la población del periodo, y 0 cuando hay más de un registro con esa misma identificación.", "poblacion": "Todos los clientes PN/PJ del periodo. Solo aplica al atributo numero_documento.", "reglas": {"numero_documento": {"que_hace": "No hay otro cliente con el mismo tipo y número de documento en el universo del periodo (conteo por ventana igual a 1).", "sql": "CASE\n    WHEN COUNT(*) OVER (PARTITION BY rb.tipo_id, rb.numero_documento) = 1\n    THEN 1 ELSE 0\nEND AS rg_unicidad_numero_documento"}}}, "pct_precision": {"titulo": "Precisión", "explicacion": "Mide coherencia financiera entre ingresos y egresos declarados: el monto evaluado debe ser mayor que cero y los ingresos deben ser mayores o iguales que los egresos. La regla vale 1 si la relación es coherente y 0 si no; el anillo es AVG(regla) * 100.", "poblacion": "Solo clientes que declaran SARLAFT (declara_sarlaft = 1) y únicamente los atributos total_ingresos y total_egresos. Si en la corrida no hay acceso al formulario SARLAFT, esta dimensión queda «sin datos».", "reglas": {"total_ingresos": {"que_hace": "Los ingresos están informados, son mayores que cero, los egresos están informados y los ingresos son mayores o iguales que los egresos.", "sql": "CASE\n    WHEN rb.total_ingresos IS NOT NULL\n     AND rb.total_ingresos > 0\n     AND rb.total_egresos IS NOT NULL\n     AND rb.total_ingresos >= rb.total_egresos\n    THEN 1 ELSE 0\nEND AS rg_precision_ingresos"}, "total_egresos": {"que_hace": "Los egresos están informados, son mayores que cero, los ingresos están informados y los ingresos son mayores o iguales que los egresos.", "sql": "CASE\n    WHEN rb.total_egresos IS NOT NULL\n     AND rb.total_egresos > 0\n     AND rb.total_ingresos IS NOT NULL\n     AND rb.total_ingresos >= rb.total_egresos\n    THEN 1 ELSE 0\nEND AS rg_precision_egresos"}}}, "pct_oportunidad": {"titulo": "Oportunidad", "explicacion": "Mide si el dato fue actualizado dentro del plazo del perfil de riesgo del cliente: 365 días para Intensificado (aparece en lista PEP) y 1.095 días para Obligado y Ordinario, más 30 días de gracia. La regla vale 1 cuando la antigüedad de la última actualización del dato + 30 días no supera ese plazo, y 0 en caso contrario. La fecha de actualización de cada atributo se toma de la fuente que aportó el dato (SCT → SARLAFT → iAxis → AS400).", "poblacion": "Todos los clientes PN/PJ del periodo; los atributos financieros solo sobre clientes que declaran SARLAFT. Un dato sin fecha de actualización cuenta como no oportuno (regla = 0).", "reglas": {"numero_documento": {"que_hace": "La última actualización del número de documento está dentro del plazo del perfil de riesgo (+30 días de gracia).", "sql": "CASE\n    WHEN rb.fecha_actualizacion_numero_documento IS NOT NULL\n     AND (DATEDIFF(day, rb.fecha_actualizacion_numero_documento, CURRENT_DATE) + 30) <= rb.perfil_riesgo\n    THEN 1 ELSE 0\nEND AS rg_oportunidad_numero_documento"}, "nombres_completos": {"que_hace": "La última actualización del nombre está dentro del plazo del perfil de riesgo (+30 días de gracia).", "sql": "CASE\n    WHEN rb.fecha_actualizacion_nombres IS NOT NULL\n     AND (DATEDIFF(day, rb.fecha_actualizacion_nombres, CURRENT_DATE) + 30) <= rb.perfil_riesgo\n    THEN 1 ELSE 0\nEND AS rg_oportunidad_nombres"}, "fecha_nacimiento": {"que_hace": "La última actualización de la fecha de nacimiento está dentro del plazo del perfil de riesgo (+30 días de gracia).", "sql": "CASE\n    WHEN rb.fecha_actualizacion_fecha_nacimiento IS NOT NULL\n     AND (DATEDIFF(day, rb.fecha_actualizacion_fecha_nacimiento, CURRENT_DATE) + 30) <= rb.perfil_riesgo\n    THEN 1 ELSE 0\nEND AS rg_oportunidad_fecha_nacimiento"}, "fecha_vinculacion": {"que_hace": "La última actualización del registro de persona en iAxis (fmovimi) está dentro del plazo del perfil de riesgo (+30 días de gracia).", "sql": "CASE\n    WHEN rb.fecha_actualizacion_fecha_vinculacion IS NOT NULL\n     AND (DATEDIFF(day, rb.fecha_actualizacion_fecha_vinculacion, CURRENT_DATE) + 30) <= rb.perfil_riesgo\n    THEN 1 ELSE 0\nEND AS rg_oportunidad_fecha_vinculacion"}, "celular": {"que_hace": "La última actualización del celular está dentro del plazo del perfil de riesgo (+30 días de gracia).", "sql": "CASE\n    WHEN rb.fecha_actualizacion_celular IS NOT NULL\n     AND (DATEDIFF(day, rb.fecha_actualizacion_celular, CURRENT_DATE) + 30) <= rb.perfil_riesgo\n    THEN 1 ELSE 0\nEND AS rg_oportunidad_celular"}, "correo_electronico": {"que_hace": "La última actualización del correo está dentro del plazo del perfil de riesgo (+30 días de gracia).", "sql": "CASE\n    WHEN rb.fecha_actualizacion_correo IS NOT NULL\n     AND (DATEDIFF(day, rb.fecha_actualizacion_correo, CURRENT_DATE) + 30) <= rb.perfil_riesgo\n    THEN 1 ELSE 0\nEND AS rg_oportunidad_correo"}, "total_activos": {"que_hace": "La última actualización de los activos declarados está dentro del plazo del perfil de riesgo (+30 días de gracia).", "sql": "CASE\n    WHEN rb.fecha_actualizacion_activos IS NOT NULL\n     AND (DATEDIFF(day, rb.fecha_actualizacion_activos, CURRENT_DATE) + 30) <= rb.perfil_riesgo\n    THEN 1 ELSE 0\nEND AS rg_oportunidad_activos"}, "total_pasivos": {"que_hace": "La última actualización de los pasivos declarados está dentro del plazo del perfil de riesgo (+30 días de gracia).", "sql": "CASE\n    WHEN rb.fecha_actualizacion_pasivos IS NOT NULL\n     AND (DATEDIFF(day, rb.fecha_actualizacion_pasivos, CURRENT_DATE) + 30) <= rb.perfil_riesgo\n    THEN 1 ELSE 0\nEND AS rg_oportunidad_pasivos"}, "total_ingresos": {"que_hace": "La última actualización de los ingresos declarados está dentro del plazo del perfil de riesgo (+30 días de gracia).", "sql": "CASE\n    WHEN rb.fecha_actualizacion_ingresos IS NOT NULL\n     AND (DATEDIFF(day, rb.fecha_actualizacion_ingresos, CURRENT_DATE) + 30) <= rb.perfil_riesgo\n    THEN 1 ELSE 0\nEND AS rg_oportunidad_ingresos"}, "total_egresos": {"que_hace": "La última actualización de los egresos declarados está dentro del plazo del perfil de riesgo (+30 días de gracia).", "sql": "CASE\n    WHEN rb.fecha_actualizacion_egresos IS NOT NULL\n     AND (DATEDIFF(day, rb.fecha_actualizacion_egresos, CURRENT_DATE) + 30) <= rb.perfil_riesgo\n    THEN 1 ELSE 0\nEND AS rg_oportunidad_egresos"}}}, "dq": {"titulo": "Comportamiento general (DQ Score)", "explicacion": "Promedio simple de las 5 dimensiones (Completitud, Validez, Unicidad, Precisión y Oportunidad); cada dimensión se promedia antes sobre sus celdas atributo × segmento aplicables. Las dimensiones sin datos no entran al promedio. No tiene reglas SQL propias: haga click en cada anillo de dimensión para ver sus reglas.", "poblacion": "", "reglas": {}}}};
+const M = DATA.metricas;
+const R = DATA.resumen;
+const TARGET = DATA.target;
+const DICC = DATA.diccionario || {};
+const REGLAS = DATA.reglas || {};
+const fmtInt = new Intl.NumberFormat('es-CO').format;
+
+const DIMS = [
+  {key:'pct_completitud', label:'Completitud', desc:'El dato está presente y no vacío.'},
+  {key:'pct_validez',     label:'Validez',     desc:'El dato cumple formato/regla: correo con estructura válida, celular de 10 dígitos, nombres solo letras, fechas coherentes, montos no negativos.'},
+  {key:'pct_unicidad',    label:'Unicidad',    desc:'Sin duplicados de tipo + número de documento. Solo aplica al atributo numero_documento.'},
+  {key:'pct_precision',   label:'Precisión',   desc:'Coherencia financiera: ingresos ≥ egresos y monto > 0. Solo aplica a total_ingresos y total_egresos de clientes que declaran SARLAFT.'},
+  {key:'pct_oportunidad', label:'Oportunidad', desc:'El dato fue actualizado dentro del plazo del perfil de riesgo: 365 días si es Intensificado/PEP y 1.095 días en el resto, con 30 días de gracia.'},
+];
+const ESTADOS = {
+  'BUENO':   {c:'var(--good)',     i:'✓'},
+  'ALERTA':  {c:'var(--warn)',     i:'▲'},
+  'GRAVE':   {c:'var(--serious)',  i:'●'},
+  'CRÍTICO': {c:'var(--critical)', i:'✕'},
+};
+function estado(pct){
+  const u = DATA.umbrales['default'];
+  if (pct >= u.BUENO) return 'BUENO';
+  if (pct >= u.ALERTA) return 'ALERTA';
+  if (pct >= u.GRAVE) return 'GRAVE';
+  return 'CRÍTICO';
+}
+function chip(e, txt){
+  const s = ESTADOS[e];
+  return '<span class="chip" style="--c:'+s.c+'"><span class="ico">'+s.i+'</span>'+(txt || e)+'</span>';
+}
+function barra(p){
+  const w = Math.max(0, Math.min(100, p));
+  return '<div class="track" data-tip="'+p.toFixed(2)+' % (escala completa 0–100)"><div class="fill" style="width:'+w+'%"></div></div>';
+}
+/* Nombre de atributo: al pasar el mouse muestra su definición vía el tooltip data-tip. */
+function escAttr(s){ return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+function tdAtributo(nombre){
+  const d = DICC[nombre];
+  return '<td class="campo"'+(d ? ' data-tip="'+escAttr(d)+'"' : '')+'>'+nombre+'</td>';
+}
+function gauge(pct, color, size){
+  const st = 11, r = (size - st) / 2 - 1, c = 2 * Math.PI * r, half = size / 2;
+  const off = c * (1 - Math.max(0, Math.min(100, pct == null ? 0 : pct)) / 100);
+  let g = '<g transform="rotate(-90 '+half+' '+half+')">'
+    + '<circle cx="'+half+'" cy="'+half+'" r="'+r+'" fill="none" stroke="var(--track)" stroke-width="'+st+'"/>';
+  if (pct != null){
+    g += '<circle cx="'+half+'" cy="'+half+'" r="'+r+'" fill="none" stroke="'+color+'" stroke-width="'+st+'"'
+      + ' stroke-linecap="round" stroke-dasharray="'+c.toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'"/>';
+  }
+  g += '</g><text x="'+half+'" y="'+(half+6)+'" text-anchor="middle" class="big" font-size="'+(size>=124?18:16)+'">'
+    + (pct == null ? '—' : pct.toFixed(2)+'%') + '</text>';
+  return '<svg width="'+size+'" height="'+size+'" data-tip="'+(pct == null ? 'Sin datos' : pct.toFixed(2)+' %')+' · Click: ver campos y reglas">'+g+'</svg>';
+}
+function media(vals){
+  const v = vals.filter(x => x != null);
+  return v.length ? v.reduce((a,b) => a+b, 0) / v.length : null;
+}
+function rTP(tp){ return R.find(r => r.tipo_persona === tp) || null; }
+
+/* ---- tarjetas de población ---- */
+const rpn = rTP(1), rpj = rTP(2);
+const totalTodos = R.reduce((a,r) => a + r.total_clientes, 0);
+const nPN = rpn ? rpn.total_clientes : 0;
+const nPJ = rpj ? rpj.total_clientes : 0;
+const sinClasif = totalTodos - nPN - nPJ;
+const decl = (rpn ? rpn.declaran_sarlaft : 0) + (rpj ? rpj.declaran_sarlaft : 0);
+const sum = k => (rpn ? rpn[k] : 0) + (rpj ? rpj[k] : 0);
+const tiles = [
+  ['Clientes vigentes', fmtInt(totalTodos), 'Tomadores únicos del periodo '+DATA.periodo],
+  ['Persona natural', fmtInt(nPN), (totalTodos ? (100*nPN/totalTodos).toFixed(1) : '0')+' % del total'],
+  ['Persona jurídica', fmtInt(nPJ), (totalTodos ? (100*nPJ/totalTodos).toFixed(1) : '0')+' % del total'],
+  ['Declaran SARLAFT', ((nPN+nPJ) ? (100*decl/(nPN+nPJ)).toFixed(1) : '0')+' %', fmtInt(decl)+' clientes clasificados'],
+  ['Intensificado (PEP)', fmtInt(sum('intensificado')), 'Actualización exigida cada 365 días'],
+  ['Obligado', fmtInt(sum('obligado')), 'Diligenciaron formulario SARLAFT'],
+  ['Ordinario', fmtInt(sum('ordinario')), 'Sin formulario ni lista PEP'],
+];
+if (sinClasif > 0) tiles.push(['Sin clasificar', fmtInt(sinClasif), 'Tipo de documento no mapeado a PN/PJ (no entra a las métricas)']);
+document.getElementById('tiles').innerHTML = tiles.map(t =>
+  '<div class="tile"><div class="lbl">'+t[0]+'</div><div class="val">'+t[1]+'</div><div class="desc">'+t[2]+'</div></div>').join('');
+
+/* ---- anillos por dimensión ---- */
+let gs = '';
+const medias = DIMS.map(d => media(M.map(m => m[d.key])));
+DIMS.forEach((d, i) => {
+  const pct = medias[i];
+  const e = pct == null ? null : estado(pct);
+  gs += '<div class="gauge" data-dim="'+d.key+'"><div class="glbl" data-tip="'+escAttr(d.desc)+'">'+d.label+'</div>'
+      + gauge(pct, e ? ESTADOS[e].c : 'var(--muted)', 112)
+      + '<div style="margin-top:8px">'+(e ? chip(e) : '<span class="chip" style="--c:var(--muted)">sin datos</span>')+'</div>'
+      + '<div class="hint">Click: ver campos y reglas</div></div>';
+});
+const dq = media(medias);
+gs += '<div class="gauge dq" data-dim="dq"><div class="glbl"><strong>Comportamiento general</strong><br>(DQ Score)</div>'
+    + gauge(dq, 'var(--brand)', 124)
+    + '<div style="margin-top:8px">'+(dq != null ? chip(estado(dq)) : '')+'</div>'
+    + '<div class="hint">Click: ver campos y reglas</div></div>';
+document.getElementById('gauges').innerHTML = gs;
+
+/* ---- tablas por tipo de persona ---- */
+function celda(v){
+  if (v == null) return '<td class="num" data-tip="No aplica para este atributo">—</td>';
+  return '<td class="num">'+chip(estado(v), v.toFixed(2)+' %')+'</td>';
+}
+const th = '<th>Atributo</th>' + DIMS.map(d => '<th class="num" data-tip="'+escAttr(d.desc)+'">'+d.label+'</th>').join('');
+document.getElementById('tablas').innerHTML = [1, 2].map(tp => {
+  const rows = M.filter(m => m.tipo_persona === tp)
+    .map(m => '<tr>'+tdAtributo(m.atributo)+DIMS.map(d => celda(m[d.key])).join('')+'</tr>').join('');
+  if (!rows) return '';
+  return '<section><h2>'+(tp === 1 ? 'Persona natural' : 'Persona jurídica')+' — calidad por atributo</h2>'
+    + '<p class="nota">% de clientes que cumplen cada regla. «—» = la dimensión no aplica a ese atributo '
+    + '(unicidad solo al documento; precisión solo a ingresos/egresos). Los atributos financieros se evalúan '
+    + 'solo sobre clientes que declaran SARLAFT. Pase el mouse por un atributo o dimensión para ver su definición.</p>'
+    + '<div class="twrap"><table class="verde"><thead><tr>'+th+'</tr></thead><tbody>'+rows+'</tbody></table></div></section>';
+}).join('');
+
+/* ---- ranking de remediación ---- */
+const cells = [];
+M.forEach(m => DIMS.forEach(d => {
+  const v = m[d.key];
+  if (v != null) cells.push({tp: m.desc_tipo_persona, at: m.atributo, dim: d.label, pct: v});
+}));
+cells.sort((a, b) => a.pct - b.pct);
+const worst = cells.filter(c => c.pct < TARGET).slice(0, 15);
+document.getElementById('lblTarget').textContent = TARGET;
+document.getElementById('ranking').innerHTML = worst.length
+  ? '<div class="twrap"><table><thead><tr><th>Atributo</th><th>Dimensión</th><th>Segmento</th>'
+    + '<th style="width:150px">Escala 0–100</th><th class="num">%</th><th>Estado</th></tr></thead><tbody>'
+    + worst.map(c => '<tr>'+tdAtributo(c.at)+'<td>'+c.dim+'</td><td>'+c.tp+'</td>'
+        + '<td>'+barra(c.pct)+'</td><td class="num">'+c.pct.toFixed(2)+'</td>'
+        + '<td>'+chip(estado(c.pct))+'</td></tr>').join('')
+    + '</tbody></table></div>'
+  : '<p class="nota">Todas las celdas atributo × dimensión están en o por encima del umbral de '+TARGET+' %.</p>';
+
+/* ---- información ---- */
+const u = DATA.umbrales['default'];
+document.getElementById('info').innerHTML =
+  '<div><h3>Nombre del reporte</h3>'
+  + '<p class="kv"><b>Calidad de Datos — Clientes SARLAFT / PEP</b> (tablero HTML autocontenido)</p>'
+  + '<p class="kv"><b>Periodo:</b> '+DATA.periodo+'<br><b>Generado:</b> '+DATA.generado
+  + '<br><b>Lista PEP:</b> co_sandbox_datos.'+DATA.tabla_pep
+  + '<br><b>Desarrollador del reporte:</b> Wilson Jerez — Analista Senior De Gobierno De Datos</p>'
+  + '<h3>Población evaluada</h3>'
+  + '<p>Tomadores con póliza vigente en el periodo (co_sandbox_datos.fact_vigentes_total_historico), '
+  + 'enriquecidos con la mejor fuente disponible por atributo, en este orden de prioridad: '
+  + '<b>Compra de datos SCT → Formulario SARLAFT → iAxis (ODS) → AS400 (ODS)</b>. '
+  + 'La lista PEP proviene de Pirani.</p>'
+  + '<h3>Clasificación de riesgo</h3><ul>'
+  + '<li><b>Intensificado:</b> el cliente aparece en la lista PEP — actualización exigida cada 365 días.</li>'
+  + '<li><b>Obligado:</b> diligenció formulario SARLAFT — actualización cada 1.095 días.</li>'
+  + '<li><b>Ordinario:</b> el resto — actualización cada 1.095 días.</li>'
+  + '<li>En Oportunidad se otorgan 30 días de gracia sobre esos plazos.</li></ul></div>'
+  + '<div><h3>Dimensiones</h3><ul>'
+  + DIMS.map(d => '<li><b>'+d.label+':</b> '+d.desc+'</li>').join('')
+  + '<li><b>DQ Score:</b> promedio simple de las 5 dimensiones (cada una promediada sobre sus celdas aplicables).</li></ul>'
+  + '<h3>Umbrales de estado</h3><ul>'
+  + '<li>BUENO ≥ '+u.BUENO+' · ALERTA ≥ '+u.ALERTA+' · GRAVE ≥ '+u.GRAVE+' · CRÍTICO &lt; '+u.GRAVE+'</li>'
+  + '<li>Umbral de cumplimiento del reporte: '+TARGET+' % (mismo corte de los indicadores cumple_*_90 del SQL).</li></ul>'
+  + '<h3>Notas</h3><ul>'
+  + (DATA.sarlaft_disponible ? '' : '<li><b>⚠ Corrida sin el formulario SARLAFT:</b> el usuario que generó el reporte no tiene permiso sobre dp_dm_compliance.vm_formulario_sarlaft, así que nadie queda como «declara SARLAFT» ni «Obligado» y los atributos financieros no se evalúan. Las demás métricas sí son completas.</li>')
+  + '<li>Los atributos financieros (activos, pasivos, ingresos, egresos) solo se evalúan sobre clientes que declaran SARLAFT.</li>'
+  + '<li>El notebook solo crea tablas temporales de sesión: no escribe nada permanente en la base.</li>'
+  + '<li>Este tablero no contiene datos personales: solo métricas agregadas.</li></ul></div>';
+
+document.getElementById('sub').textContent =
+  'Periodo '+DATA.periodo+' · Actualizado: '+DATA.generado+' · Umbral de cumplimiento: '+TARGET+' % · Solo métricas agregadas (sin datos personales)'
+  + (DATA.sarlaft_disponible ? '' : ' · ⚠ CORRIDA SIN EL FORMULARIO SARLAFT (métricas parciales)');
+document.getElementById('pie').textContent =
+  'Tablero autocontenido generado por notebooks/dq_clientes_sarlaft_pep_runner.ipynb — reglas de notebooks/dq_clientes_sarlaft_pep.sql.';
+
+/* ---- modal de detalle por dimensión (click en cada anillo) ---- */
+const modalBg = document.getElementById('modalBg');
+const modal = document.getElementById('modal');
+function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function abrirModal(dimKey){
+  const meta = REGLAS[dimKey];
+  if (!meta) return;
+  const esDQ = dimKey === 'dq';
+  const idx = DIMS.findIndex(d => d.key === dimKey);
+  const pct = esDQ ? media(medias) : medias[idx];
+  const e = pct == null ? null : estado(pct);
+  let h = '<div class="mhead"><h2>'+escHtml(meta.titulo)+'</h2>'
+    + (pct != null
+        ? '<span class="num" style="font-weight:600">'+pct.toFixed(2)+' %</span>'+chip(e)
+        : '<span class="chip" style="--c:var(--muted)">sin datos</span>')
+    + '<button class="cerrar" id="btnCerrar">✕ Cerrar</button></div>';
+  h += '<h3>Qué mide</h3><p>'+escHtml(meta.explicacion)+'</p>';
+  if (meta.poblacion) h += '<p><b>Población evaluada:</b> '+escHtml(meta.poblacion)+'</p>';
+  if (esDQ){
+    h += '<h3>Composición del puntaje</h3>'
+      + '<div class="twrap"><table><thead><tr><th>Dimensión</th><th class="num">%</th><th>Estado</th></tr></thead><tbody>'
+      + DIMS.map((d, i) => '<tr><td>'+d.label+'</td>'
+          + '<td class="num">'+(medias[i] == null ? '—' : medias[i].toFixed(2))+'</td>'
+          + '<td>'+(medias[i] == null
+              ? '<span class="chip" style="--c:var(--muted)">sin datos</span>'
+              : chip(estado(medias[i])))+'</td></tr>').join('')
+      + '</tbody></table></div>';
+  } else {
+    const celdas = [];
+    M.forEach(m => { const v = m[dimKey]; if (v != null) celdas.push({tp: m.desc_tipo_persona, at: m.atributo, pct: v}); });
+    const fallan = celdas.filter(c => c.pct < TARGET).sort((a, b) => a.pct - b.pct);
+    h += '<h3>Campos que fallan (por debajo de '+TARGET+' %)</h3>';
+    if (!celdas.length){
+      h += '<p>Sin datos evaluables en esta corrida'
+        + (DATA.sarlaft_disponible ? '.' : ': requiere el formulario SARLAFT (dp_dm_compliance.vm_formulario_sarlaft), no disponible para el usuario que generó el reporte.')+'</p>';
+    } else if (!fallan.length){
+      h += '<p>Ningún campo por debajo del umbral: todos los atributos cumplen en ambos segmentos.</p>';
+    } else {
+      h += '<div class="twrap"><table><thead><tr><th>Atributo</th><th>Segmento</th>'
+        + '<th style="width:150px">Escala 0–100</th><th class="num">%</th><th>Estado</th></tr></thead><tbody>'
+        + fallan.map(c => '<tr>'+tdAtributo(c.at)+'<td>'+c.tp+'</td><td>'+barra(c.pct)+'</td>'
+            + '<td class="num">'+c.pct.toFixed(2)+'</td><td>'+chip(estado(c.pct))+'</td></tr>').join('')
+        + '</tbody></table></div>';
+    }
+    const orden = Object.keys(meta.reglas || {});
+    const fallaAt = new Set(fallan.map(c => c.at));
+    orden.sort((a, b) => (fallaAt.has(b) ? 1 : 0) - (fallaAt.has(a) ? 1 : 0));
+    if (orden.length){
+      h += '<h3>Reglas de cálculo por atributo</h3>'
+        + '<p>Explicación en lenguaje natural y, debajo, la regla SQL literal del Bloque B '
+        + '(notebooks/dq_clientes_sarlaft_pep.sql). Los atributos que fallan aparecen primero y abiertos.</p>';
+      h += orden.map(at => {
+        const r = meta.reglas[at];
+        const pcts = [1, 2].map(tp => {
+          const m = M.find(x => x.tipo_persona === tp && x.atributo === at);
+          return m && m[dimKey] != null ? (tp === 1 ? 'PN ' : 'PJ ')+m[dimKey].toFixed(2)+' %' : null;
+        }).filter(Boolean).join(' · ');
+        const peor = fallan.filter(c => c.at === at).map(c => c.pct);
+        return '<details'+(fallaAt.has(at) ? ' open' : '')+'><summary><span class="campo">'+at+'</span>'
+          + (pcts ? ' — '+pcts+' ' : ' ')
+          + (fallaAt.has(at) ? chip(estado(Math.min.apply(null, peor)), 'incumple') : '')+'</summary>'
+          + '<p>'+escHtml(r.que_hace)+'</p><pre class="sql">'+escHtml(r.sql)+'</pre></details>';
+      }).join('');
+    }
+  }
+  modal.innerHTML = h;
+  modalBg.classList.add('open');
+  document.getElementById('btnCerrar').onclick = cerrarModal;
+}
+function cerrarModal(){ modalBg.classList.remove('open'); }
+modalBg.addEventListener('click', ev => { if (ev.target === modalBg) cerrarModal(); });
+document.addEventListener('keydown', ev => { if (ev.key === 'Escape') cerrarModal(); });
+document.getElementById('gauges').addEventListener('click', ev => {
+  const g = ev.target.closest ? ev.target.closest('.gauge') : null;
+  if (g && g.dataset.dim) abrirModal(g.dataset.dim);
+});
+
+/* Tooltip compartido (los valores también están en tablas — el tooltip nunca es la única vía). */
+const tip = document.getElementById('tip');
+document.addEventListener('mousemove', ev => {
+  const t = ev.target.closest ? ev.target.closest('[data-tip]') : null;
+  if (t){
+    tip.textContent = t.getAttribute('data-tip');
+    tip.style.display = 'block';
+    tip.style.left = Math.min(ev.clientX + 14, window.innerWidth - tip.offsetWidth - 10)+'px';
+    tip.style.top = (ev.clientY + 16)+'px';
+  } else tip.style.display = 'none';
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+﻿Campo,Descripción,Tipo de dato,Ejemplo
+policy_transaction_movement_sk,Identificador único (surrogate key) del movimiento de transacción de póliza.,BIGINT,9794069171
+source_system,"Sistema fuente del dato (ej. CO_iaxis, CO_as400).",VARCHAR(50),CO_iaxis
+audit_transaction_id,Identificador de auditoría de la transacción en procesos ETL/CDP.,VARCHAR(50),73890630-1-9037-248275060
+customer_sk,Clave surrogate del cliente para enlazar con la dimensión de clientes.,INTEGER,857634872
+quote_sk,Clave surrogate de la cotización para enlazar con la dimensión de cotizaciones.,INTEGER,-1
+policy_sk,Clave surrogate de la póliza para enlazar con la dimensión de pólizas.,INTEGER,488167784
+risk_sk,Clave surrogate del riesgo para enlazar con la dimensión de riesgos.,INTEGER,952647505
+policy_item_sk,Clave surrogate del ítem de póliza (objeto asegurado/cobertura específica).,INTEGER,9123182
+insured_sk,Clave surrogate del asegurado (persona/natural o jurídica).,INTEGER,363671399
+vehicle_sk,Clave surrogate del vehículo (aplica para ramo autos).,INTEGER,59866927
+coverage_sk,Clave surrogate de la cobertura contratada.,BIGINT,5874598992
+producer_sk,Clave surrogate del productor/intermediario (agente/broker).,INTEGER,136921
+branch_sk,Clave surrogate de la sucursal/comercial.,INTEGER,446
+product_sk,Clave surrogate del producto asegurador.,INTEGER,1210
+lob_sk,Clave surrogate de la línea de negocio (Line of Business).,INTEGER,553
+risk_id,Identificador de negocio del riesgo; suele incluir secuencia (ej. 269769-1).,VARCHAR(50),123089-1
+sseguro,Identificador derivado del riesgo (parte previa al guion de risk_id).,INTEGER,4312014
+risk_number,Número de riesgo asociado en el sistema comercial/técnico.,INTEGER,2126
+policy_number,Número de póliza utilizado en procesos de negocio y conciliación.,INTEGER,76520
+coverage_code,Código de cobertura (dominio de catálogo técnico/comercial).,INTEGER,3114
+product_code,Código de producto (dominio de catálogo técnico/comercial).,INTEGER,6046
+transaction_date_sk,Fecha del movimiento (YYYYMMDD) para enlazar calendario.,INTEGER,20180402
+policy_effective_date_sk,Fecha de efectividad de póliza (YYYYMMDD).,INTEGER,20150829
+policy_expiration_date_sk,Fecha de vencimiento de póliza (YYYYMMDD).,INTEGER,20260507
+inception_date_sk,Fecha de inicio (inception) del contrato (YYYYMMDD).,INTEGER,20250422
+transaction_type,"Tipo de transacción (Nueva producción, Renovación, Suplemento, Anulación, Rehabilitación, etc.).",INTEGER,3
+transaction_type_description,Descripción legible del tipo de transacción.,VARCHAR(50),Movimiento anulado
+movement_type,Clasificación adicional del movimiento (incluye “Movimiento anulado” cuando aplica).,VARCHAR(255),
+transaction_effective_date_sk,Fecha efectiva del movimiento (YYYYMMDD).,INTEGER,20241002
+transaction_expiration_date_sk,Fecha de expiración del movimiento (YYYYMMDD).,INTEGER,-1
+receipt_type,Tipo de recibo emitido en el movimiento.,VARCHAR(50),unificado-total
+receipt_number,Número de recibo asociado a la transacción.,INTEGER,10182965
+transaction_delta_billed_premium_amount,Variación de prima facturada por el movimiento (monto neto).,"NUMERIC(17
+10)",27154
+transaction_delta_billed_premium_amount_raw,Variación de prima facturada (valor bruto sin normalización).,"NUMERIC(17
+10)",324000
+transaction_delta_net_written_premium_amount,Variación de prima neta suscrita por el movimiento.,"NUMERIC(9
+2)",-17
+transaction_delta_net_written_premium_amount_raw,Variación de prima neta suscrita (valor bruto).,"NUMERIC(9
+2)",15964
+transaction_delta_base_premium_amount,Variación de prima base del movimiento.,VARCHAR(255),
+transaction_delta_base_annual_premium_amount,Variación de prima base anual del movimiento.,VARCHAR(255),
+transaction_delta_commission_amount,Variación de comisión asociada al movimiento.,"10)
+NUMERIC(16",-1127
+transaction_delta_commission_amount_raw,Variación de comisión (valor bruto sin normalización).,"10)
+NUMERIC(16",7229
+transaction_delta_total_tax_amount,Variación total de impuestos del movimiento.,VARCHAR(255),
+transaction_delta_concierge_tax_amount,Variación de tasa “concierge” (si aplica).,VARCHAR(255),
+transaction_delta_clea_tax_amount,Variación de impuesto CLEA (si aplica).,VARCHAR(255),
+transaction_delta_fng_tax_amount,Variación de aporte al FNG (si aplica).,VARCHAR(255),
+transaction_delta_ips_tax_amount,Variación de impuesto IPS (si aplica).,VARCHAR(255),
+transaction_delta_ie_tax_amount,Variación de impuesto IE (si aplica).,VARCHAR(255),
+transaction_delta_ipt_tax_amount,Variación de impuesto IPT (si aplica).,VARCHAR(255),
+transaction_delta_miicf_tax_amount,Variación de tasa MIICF (si aplica).,VARCHAR(255),
+transaction_delta_compens_fund_tax_amount,Variación de fondo de compensación (si aplica).,VARCHAR(255),
+transaction_delta_statutory_tax_amount,Variación de impuestos estatutarios.,INTEGER,0
+transaction_delta_statutory_ie_tax_amount,Variación de impuesto estatutario IE.,VARCHAR(255),
+transaction_accounting_ts,Timestamp contable del movimiento.,TIMESTAMP,2018-03-11 00:00:00.000
+transaction_delta_consorcio_occupant_tax_amount,Variación de tasa consorcio/ocupantes (si aplica).,VARCHAR(255),
+transaction_delta_selo_tax_amount,Variación de tasa “selo” (si aplica).,VARCHAR(255),
+transaction_delta_selo_dac_tax_amount,Variación de tasa “selo DAC” (si aplica).,VARCHAR(255),
+load_ts,Timestamp de carga en la bodega CDP.,VARCHAR(255),
+transaction_delta_uninsured_auto_fund_fee_amount,Variación de tasa fondo autos no asegurados.,VARCHAR(255),
+transaction_delta_road_safety_fee_amount,Variación de tasa de seguridad vial.,VARCHAR(255),
+transaction_delta_medical_emergency_fund_fee_amount,Variación de tasa fondo de emergencia médica.,VARCHAR(255),
+transaction_delta_green_card_fee_amount,Variación de tasa “green card” (internacional) si aplica.,VARCHAR(255),
+performer_login,Usuario que ejecutó la operación en el sistema fuente.,VARCHAR(255),
+creator_login,Usuario que registró/creó la operación en el sistema fuente.,VARCHAR(50),KAREN.GAMBA
+current_record_flag,Marca de vigencia del registro (1 vigente / 0 histórico).,BOOLEAN,1
+accountable_period,Periodo contable (ej. 201409) derivado para consolidación contable.,INTEGER,201412
