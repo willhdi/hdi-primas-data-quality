@@ -1,18 +1,10 @@
--- =====================================================================
--- KPI Cubo Unificado: los 5 indicadores en formato largo
--- (periodo_contable + tipo_indicador + nombre_campo), persistido en
--- co_sandbox_datos.kpi_cubo_mensual.
---
--- Patrón idempotente: se borra la ventana de 3 años que la consulta
--- recalcula y se vuelve a insertar. Los periodos más antiguos que la
--- ventana se conservan como histórico.
--- =====================================================================
 
--- 1) Tabla persistida del cubo
 CREATE TABLE IF NOT EXISTS co_sandbox_datos.kpi_cubo_mensual (
     periodo_contable INTEGER,
+    periodo_fecha    DATE,          -- periodo_contable (YYYYMM) casteado a fecha (primer día del mes)
     tipo_indicador   VARCHAR(30),
     nombre_campo     VARCHAR(100),
+    nombre_natural   VARCHAR(150),  -- resumen legible del campo (tomado del diccionario)
     total_registros  BIGINT,
     cantidad_mala    BIGINT,
     porcentaje       DECIMAL(5,2),
@@ -20,13 +12,12 @@ CREATE TABLE IF NOT EXISTS co_sandbox_datos.kpi_cubo_mensual (
     fecha_calculo    TIMESTAMP
 );
 
--- 2) Refresco idempotente: borrar la misma ventana de 3 años que se recalcula
 DELETE FROM co_sandbox_datos.kpi_cubo_mensual
 WHERE periodo_contable >= CAST(TO_CHAR(CURRENT_DATE - INTERVAL '3 years', 'YYYYMM') AS INTEGER);
 
 -- 3) Recalcular e insertar el cubo completo
 INSERT INTO co_sandbox_datos.kpi_cubo_mensual
-    (periodo_contable, tipo_indicador, nombre_campo, total_registros, cantidad_mala, porcentaje, es_total, fecha_calculo)
+    (periodo_contable, periodo_fecha, tipo_indicador, nombre_campo, nombre_natural, total_registros, cantidad_mala, porcentaje, es_total, fecha_calculo)
 WITH base AS (
     SELECT
         source_system,
@@ -300,22 +291,66 @@ disponibilidad_total AS (
         CASE WHEN total_ramos = 0 THEN 0 ELSE ROUND(ramos_ok * 100.0 / total_ramos, 2) END AS porcentaje,
         1 AS es_total
     FROM regla4_ramos
+),
+cubo_union AS (
+    SELECT accountable_period AS periodo_contable, tipo_indicador, nombre_campo, total_registros, cantidad_mala, porcentaje, es_total FROM completitud_detalle
+    UNION ALL
+    SELECT accountable_period, tipo_indicador, nombre_campo, total_registros, cantidad_mala, porcentaje, es_total FROM completitud_total
+    UNION ALL
+    SELECT accountable_period, tipo_indicador, nombre_campo, total_registros, cantidad_mala, porcentaje, es_total FROM exactitud_detalle
+    UNION ALL
+    SELECT accountable_period, tipo_indicador, nombre_campo, total_registros, cantidad_mala, porcentaje, es_total FROM exactitud_total
+    UNION ALL
+    SELECT accountable_period, tipo_indicador, nombre_campo, total_registros, cantidad_mala, porcentaje, es_total FROM unicidad_total
+    UNION ALL
+    SELECT accountable_period, tipo_indicador, nombre_campo, total_registros, cantidad_mala, porcentaje, es_total FROM validez_detalle
+    UNION ALL
+    SELECT accountable_period, tipo_indicador, nombre_campo, total_registros, cantidad_mala, porcentaje, es_total FROM validez_total
+    UNION ALL
+    SELECT accountable_period, tipo_indicador, nombre_campo, total_registros, cantidad_mala, porcentaje, es_total FROM disponibilidad_total
 )
-SELECT accountable_period AS periodo_contable, tipo_indicador, nombre_campo, total_registros, cantidad_mala, porcentaje, es_total, GETDATE() AS fecha_calculo FROM completitud_detalle
-UNION ALL
-SELECT accountable_period, tipo_indicador, nombre_campo, total_registros, cantidad_mala, porcentaje, es_total, GETDATE() FROM completitud_total
-UNION ALL
-SELECT accountable_period, tipo_indicador, nombre_campo, total_registros, cantidad_mala, porcentaje, es_total, GETDATE() FROM exactitud_detalle
-UNION ALL
-SELECT accountable_period, tipo_indicador, nombre_campo, total_registros, cantidad_mala, porcentaje, es_total, GETDATE() FROM exactitud_total
-UNION ALL
-SELECT accountable_period, tipo_indicador, nombre_campo, total_registros, cantidad_mala, porcentaje, es_total, GETDATE() FROM unicidad_total
-UNION ALL
-SELECT accountable_period, tipo_indicador, nombre_campo, total_registros, cantidad_mala, porcentaje, es_total, GETDATE() FROM validez_detalle
-UNION ALL
-SELECT accountable_period, tipo_indicador, nombre_campo, total_registros, cantidad_mala, porcentaje, es_total, GETDATE() FROM validez_total
-UNION ALL
-SELECT accountable_period, tipo_indicador, nombre_campo, total_registros, cantidad_mala, porcentaje, es_total, GETDATE() FROM disponibilidad_total;
+SELECT
+    periodo_contable,
+    TO_DATE(periodo_contable::VARCHAR, 'YYYYMM') AS periodo_fecha,
+    tipo_indicador,
+    nombre_campo,
+    CASE nombre_campo
+        -- >>> AUTOGEN:nombre_natural (generado por notebooks/generar_sql.py desde dq_primas_logica.NOMBRE_NATURAL — no editar a mano) <<<
+        WHEN 'source_system' THEN 'Sistema fuente'
+        WHEN 'accountable_period' THEN 'Periodo contable'
+        WHEN 'coverage_code' THEN 'Código de cobertura'
+        WHEN 'branch_sk' THEN 'Sucursal / comercial'
+        WHEN 'product_code' THEN 'Código de producto (ramo)'
+        WHEN 'transaction_date_sk' THEN 'Fecha del movimiento'
+        WHEN 'policy_effective_date_sk' THEN 'Fecha de efectividad de póliza'
+        WHEN 'policy_expiration_date_sk' THEN 'Fecha de vencimiento de póliza'
+        WHEN 'inception_date_sk' THEN 'Fecha de inicio del contrato'
+        WHEN 'transaction_type' THEN 'Tipo de transacción'
+        WHEN 'transaction_effective_date_sk' THEN 'Fecha efectiva del movimiento'
+        WHEN 'transaction_type_description' THEN 'Descripción del tipo de transacción'
+        WHEN 'current_record_flag' THEN 'Marca de vigencia del registro'
+        WHEN 'transaction_delta_billed_premium_amount' THEN 'Prima facturada (monto neto)'
+        WHEN 'transaction_delta_billed_premium_amount_raw' THEN 'Prima facturada (valor bruto)'
+        WHEN 'transaction_delta_commission_amount' THEN 'Comisión del movimiento'
+        WHEN 'risk_number' THEN 'Número de riesgo'
+        WHEN 'policy_number' THEN 'Número de póliza'
+        WHEN 'policy_transaction_movement_sk' THEN 'Identificador del movimiento'
+        WHEN 'sseguro' THEN 'Identificador de seguro (derivado del riesgo)'
+        WHEN 'receipt_type' THEN 'Tipo de recibo'
+        WHEN 'receipt_number' THEN 'Número de recibo'
+        WHEN 'TOTAL_PERIODO' THEN 'Total del periodo'
+        WHEN 'TOTAL' THEN 'Total del periodo'
+        WHEN 'disponibilidad_mes' THEN 'Disponibilidad del mes (días con datos)'
+        WHEN 'disponibilidad_regla4' THEN 'Disponibilidad por ramo (días 1–15)'
+        ELSE nombre_campo
+        -- >>> END:nombre_natural <<<
+    END AS nombre_natural,
+    total_registros,
+    cantidad_mala,
+    porcentaje,
+    es_total,
+    GETDATE() AS fecha_calculo
+FROM cubo_union;
 
 -- 4) Verificación: inspeccionar el cubo persistido
 SELECT *
