@@ -1,24 +1,5 @@
-
-CREATE TABLE IF NOT EXISTS co_sandbox_datos.kpi_cubo_mensual (
-    periodo_contable INTEGER,
-    periodo_fecha    DATE,          -- periodo_contable (YYYYMM) casteado a fecha (primer día del mes)
-    tipo_indicador   VARCHAR(30),
-    nombre_campo     VARCHAR(100),
-    nombre_natural   VARCHAR(150),  -- resumen legible del campo (tomado del diccionario)
-    total_registros  BIGINT,
-    cantidad_mala    BIGINT,
-    porcentaje       DECIMAL(5,2),
-    es_total         SMALLINT,
-    fecha_calculo    TIMESTAMP
-);
-
-DELETE FROM co_sandbox_datos.kpi_cubo_mensual
-WHERE periodo_contable >= CAST(TO_CHAR(CURRENT_DATE - INTERVAL '3 years', 'YYYYMM') AS INTEGER);
-
--- 3) Recalcular e insertar el cubo completo
-INSERT INTO co_sandbox_datos.kpi_cubo_mensual
-    (periodo_contable, periodo_fecha, tipo_indicador, nombre_campo, nombre_natural, total_registros, cantidad_mala, porcentaje, es_total, fecha_calculo)
-WITH base AS (
+CREATE OR REPLACE VIEW co_sandbox_datos.vw_kpi_cubo_mensual AS
+WITH base_pt AS (
     SELECT
         source_system,
         accountable_period,
@@ -52,39 +33,67 @@ WITH base AS (
             OR source_system = 'CO_as400'
           )
 ),
-completitud_agg AS (
+agg_pt AS (
     SELECT
         accountable_period,
         COUNT(*) AS total_registros,
-        SUM(CASE WHEN source_system IS NULL THEN 1 ELSE 0 END) AS n_source_system,
-        SUM(CASE WHEN accountable_period IS NULL THEN 1 ELSE 0 END) AS n_accountable_period,
-        SUM(CASE WHEN coverage_code IS NULL THEN 1 ELSE 0 END) AS n_coverage_code,
-        SUM(CASE WHEN branch_sk IS NULL THEN 1 ELSE 0 END) AS n_branch_sk,
-        SUM(CASE WHEN product_code IS NULL THEN 1 ELSE 0 END) AS n_product_code,
-        SUM(CASE WHEN transaction_date_sk IS NULL THEN 1 ELSE 0 END) AS n_transaction_date_sk,
-        SUM(CASE WHEN policy_effective_date_sk IS NULL THEN 1 ELSE 0 END) AS n_policy_effective_date_sk,
-        SUM(CASE WHEN policy_expiration_date_sk IS NULL THEN 1 ELSE 0 END) AS n_policy_expiration_date_sk,
-        SUM(CASE WHEN inception_date_sk IS NULL THEN 1 ELSE 0 END) AS n_inception_date_sk,
-        SUM(CASE WHEN transaction_type IS NULL THEN 1 ELSE 0 END) AS n_transaction_type,
-        SUM(CASE WHEN transaction_effective_date_sk IS NULL THEN 1 ELSE 0 END) AS n_transaction_effective_date_sk,
-        SUM(CASE WHEN transaction_type_description IS NULL THEN 1 ELSE 0 END) AS n_transaction_type_description,
-        SUM(CASE WHEN current_record_flag IS NULL THEN 1 ELSE 0 END) AS n_current_record_flag,
-        SUM(CASE WHEN transaction_delta_billed_premium_amount IS NULL THEN 1 ELSE 0 END) AS n_transaction_delta_billed_premium_amount,
-        SUM(CASE WHEN transaction_delta_commission_amount IS NULL THEN 1 ELSE 0 END) AS n_transaction_delta_commission_amount,
-        SUM(CASE WHEN risk_number IS NULL THEN 1 ELSE 0 END) AS n_risk_number,
-        SUM(CASE WHEN policy_number IS NULL THEN 1 ELSE 0 END) AS n_policy_number,
-        SUM(CASE WHEN transaction_delta_billed_premium_amount_raw IS NULL THEN 1 ELSE 0 END) AS n_transaction_delta_billed_premium_amount_raw,
-        SUM(CASE WHEN policy_transaction_movement_sk IS NULL THEN 1 ELSE 0 END) AS n_policy_transaction_movement_sk,
-        SUM(CASE WHEN sseguro IS NULL AND source_system <> 'CO_as400' THEN 1 ELSE 0 END) AS n_sseguro,
-        SUM(CASE WHEN receipt_type IS NULL AND source_system <> 'CO_as400' THEN 1 ELSE 0 END) AS n_receipt_type,
+
+        SUM(CASE WHEN source_system IS NULL THEN 1 ELSE 0 END) AS c_source_system,
+        SUM(CASE WHEN accountable_period IS NULL THEN 1 ELSE 0 END) AS c_accountable_period,
+        SUM(CASE WHEN coverage_code IS NULL THEN 1 ELSE 0 END) AS c_coverage_code,
+        SUM(CASE WHEN branch_sk IS NULL THEN 1 ELSE 0 END) AS c_branch_sk,
+        SUM(CASE WHEN product_code IS NULL THEN 1 ELSE 0 END) AS c_product_code,
+        SUM(CASE WHEN transaction_date_sk IS NULL THEN 1 ELSE 0 END) AS c_transaction_date_sk,
+        SUM(CASE WHEN policy_effective_date_sk IS NULL THEN 1 ELSE 0 END) AS c_policy_effective_date_sk,
+        SUM(CASE WHEN policy_expiration_date_sk IS NULL THEN 1 ELSE 0 END) AS c_policy_expiration_date_sk,
+        SUM(CASE WHEN inception_date_sk IS NULL THEN 1 ELSE 0 END) AS c_inception_date_sk,
+        SUM(CASE WHEN transaction_type IS NULL THEN 1 ELSE 0 END) AS c_transaction_type,
+        SUM(CASE WHEN transaction_effective_date_sk IS NULL THEN 1 ELSE 0 END) AS c_transaction_effective_date_sk,
+        SUM(CASE WHEN transaction_type_description IS NULL THEN 1 ELSE 0 END) AS c_transaction_type_description,
+        SUM(CASE WHEN current_record_flag IS NULL THEN 1 ELSE 0 END) AS c_current_record_flag,
+        SUM(CASE WHEN transaction_delta_billed_premium_amount IS NULL THEN 1 ELSE 0 END) AS c_transaction_delta_billed_premium_amount,
+        SUM(CASE WHEN transaction_delta_commission_amount IS NULL THEN 1 ELSE 0 END) AS c_transaction_delta_commission_amount,
+        SUM(CASE WHEN risk_number IS NULL THEN 1 ELSE 0 END) AS c_risk_number,
+        SUM(CASE WHEN policy_number IS NULL THEN 1 ELSE 0 END) AS c_policy_number,
+        SUM(CASE WHEN transaction_delta_billed_premium_amount_raw IS NULL THEN 1 ELSE 0 END) AS c_transaction_delta_billed_premium_amount_raw,
+        SUM(CASE WHEN sseguro IS NULL AND source_system <> 'CO_as400' THEN 1 ELSE 0 END) AS c_sseguro,
+        SUM(CASE WHEN receipt_type IS NULL AND source_system <> 'CO_as400' THEN 1 ELSE 0 END) AS c_receipt_type,
         SUM(
             CASE
                 WHEN (receipt_number IS NULL AND source_system <> 'CO_as400' AND receipt_type <> 'not-unificado')
                   OR (receipt_type = 'not-unificado' AND receipt_number IS NOT NULL)
                 THEN 1 ELSE 0
             END
-        ) AS n_receipt_number
-    FROM base
+        ) AS c_receipt_number,
+        SUM(CASE WHEN policy_transaction_movement_sk IS NULL THEN 1 ELSE 0 END) AS c_policy_transaction_movement_sk,
+
+        SUM(CASE WHEN source_system IS NULL OR source_system NOT IN ('CO_iaxis','CO_as400') THEN 1 ELSE 0 END) AS e_source_system,
+        SUM(CASE WHEN current_record_flag IS NULL OR current_record_flag NOT IN (0,1) THEN 1 ELSE 0 END) AS e_current_record_flag,
+        SUM(CASE WHEN receipt_type IS NULL OR receipt_type NOT IN ('not-unificado','unificado-detail','unificado-total') THEN 1 ELSE 0 END) AS e_receipt_type,
+
+        SUM(CASE WHEN source_system IS NULL OR source_system = 'Unknown' THEN 1 ELSE 0 END) AS v_source_system,
+        SUM(CASE WHEN coverage_code IS NULL OR coverage_code = 'Unknown' THEN 1 ELSE 0 END) AS v_coverage_code,
+        SUM(
+            CASE
+                WHEN product_code IS NULL
+                  OR product_code = 'Unknown'
+                  OR LENGTH(product_code) > 6
+                  OR product_code LIKE '% %'
+                  OR product_code ~ '[^A-Za-z0-9]'
+                  OR (source_system = 'CO_iaxis' AND product_code ~ '[A-Za-z]')
+                THEN 1 ELSE 0
+            END
+        ) AS v_product_code,
+        SUM(CASE WHEN transaction_date_sk IS NULL OR transaction_date_sk::VARCHAR !~ '^[0-9]{8}$' THEN 1 ELSE 0 END) AS v_transaction_date_sk,
+        SUM(CASE WHEN transaction_type IS NULL OR transaction_type = 'Unknown' OR LENGTH(transaction_type) > 2 THEN 1 ELSE 0 END) AS v_transaction_type,
+        SUM(CASE WHEN risk_number IS NULL OR risk_number = 'Unknown' THEN 1 ELSE 0 END) AS v_risk_number,
+        SUM(CASE WHEN policy_number IS NULL OR policy_number = 'Unknown' THEN 1 ELSE 0 END) AS v_policy_number,
+        SUM(CASE WHEN LENGTH(accountable_period::VARCHAR) <> 6 THEN 1 ELSE 0 END) AS v_accountable_period,
+        SUM(CASE WHEN policy_effective_date_sk IS NULL OR LENGTH(policy_effective_date_sk::VARCHAR) <> 8 THEN 1 ELSE 0 END) AS v_policy_effective_date_sk,
+        SUM(CASE WHEN inception_date_sk IS NULL OR LENGTH(inception_date_sk::VARCHAR) <> 8 THEN 1 ELSE 0 END) AS v_inception_date_sk,
+        SUM(CASE WHEN transaction_effective_date_sk IS NULL OR LENGTH(transaction_effective_date_sk::VARCHAR) <> 8 THEN 1 ELSE 0 END) AS v_transaction_effective_date_sk
+
+    FROM base_pt
     GROUP BY accountable_period
 ),
 completitud_detalle AS (
@@ -97,28 +106,28 @@ completitud_detalle AS (
         CASE WHEN total_registros = 0 THEN 0 ELSE ROUND(100.0 * (1 - cantidad_mala::DECIMAL / total_registros), 2) END AS porcentaje,
         0 AS es_total
     FROM (
-        SELECT accountable_period, total_registros, 'source_system' AS nombre_campo, n_source_system AS cantidad_mala FROM completitud_agg
-        UNION ALL SELECT accountable_period, total_registros, 'accountable_period', n_accountable_period FROM completitud_agg
-        UNION ALL SELECT accountable_period, total_registros, 'coverage_code', n_coverage_code FROM completitud_agg
-        UNION ALL SELECT accountable_period, total_registros, 'branch_sk', n_branch_sk FROM completitud_agg
-        UNION ALL SELECT accountable_period, total_registros, 'product_code', n_product_code FROM completitud_agg
-        UNION ALL SELECT accountable_period, total_registros, 'transaction_date_sk', n_transaction_date_sk FROM completitud_agg
-        UNION ALL SELECT accountable_period, total_registros, 'policy_effective_date_sk', n_policy_effective_date_sk FROM completitud_agg
-        UNION ALL SELECT accountable_period, total_registros, 'policy_expiration_date_sk', n_policy_expiration_date_sk FROM completitud_agg
-        UNION ALL SELECT accountable_period, total_registros, 'inception_date_sk', n_inception_date_sk FROM completitud_agg
-        UNION ALL SELECT accountable_period, total_registros, 'transaction_type', n_transaction_type FROM completitud_agg
-        UNION ALL SELECT accountable_period, total_registros, 'transaction_effective_date_sk', n_transaction_effective_date_sk FROM completitud_agg
-        UNION ALL SELECT accountable_period, total_registros, 'transaction_type_description', n_transaction_type_description FROM completitud_agg
-        UNION ALL SELECT accountable_period, total_registros, 'current_record_flag', n_current_record_flag FROM completitud_agg
-        UNION ALL SELECT accountable_period, total_registros, 'transaction_delta_billed_premium_amount', n_transaction_delta_billed_premium_amount FROM completitud_agg
-        UNION ALL SELECT accountable_period, total_registros, 'transaction_delta_commission_amount', n_transaction_delta_commission_amount FROM completitud_agg
-        UNION ALL SELECT accountable_period, total_registros, 'risk_number', n_risk_number FROM completitud_agg
-        UNION ALL SELECT accountable_period, total_registros, 'policy_number', n_policy_number FROM completitud_agg
-        UNION ALL SELECT accountable_period, total_registros, 'transaction_delta_billed_premium_amount_raw', n_transaction_delta_billed_premium_amount_raw FROM completitud_agg
-        UNION ALL SELECT accountable_period, total_registros, 'sseguro', n_sseguro FROM completitud_agg
-        UNION ALL SELECT accountable_period, total_registros, 'receipt_type', n_receipt_type FROM completitud_agg
-        UNION ALL SELECT accountable_period, total_registros, 'receipt_number', n_receipt_number FROM completitud_agg
-        UNION ALL SELECT accountable_period, total_registros, 'policy_transaction_movement_sk', n_policy_transaction_movement_sk FROM completitud_agg
+        SELECT accountable_period, total_registros, 'source_system' AS nombre_campo, c_source_system AS cantidad_mala FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'accountable_period', c_accountable_period FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'coverage_code', c_coverage_code FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'branch_sk', c_branch_sk FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'product_code', c_product_code FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'transaction_date_sk', c_transaction_date_sk FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'policy_effective_date_sk', c_policy_effective_date_sk FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'policy_expiration_date_sk', c_policy_expiration_date_sk FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'inception_date_sk', c_inception_date_sk FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'transaction_type', c_transaction_type FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'transaction_effective_date_sk', c_transaction_effective_date_sk FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'transaction_type_description', c_transaction_type_description FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'current_record_flag', c_current_record_flag FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'transaction_delta_billed_premium_amount', c_transaction_delta_billed_premium_amount FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'transaction_delta_commission_amount', c_transaction_delta_commission_amount FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'risk_number', c_risk_number FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'policy_number', c_policy_number FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'transaction_delta_billed_premium_amount_raw', c_transaction_delta_billed_premium_amount_raw FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'sseguro', c_sseguro FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'receipt_type', c_receipt_type FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'receipt_number', c_receipt_number FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'policy_transaction_movement_sk', c_policy_transaction_movement_sk FROM agg_pt
     ) t
 ),
 completitud_total AS (
@@ -133,16 +142,6 @@ completitud_total AS (
     FROM completitud_detalle
     GROUP BY accountable_period
 ),
-exactitud_agg AS (
-    SELECT
-        accountable_period,
-        COUNT(*) AS total_registros,
-        SUM(CASE WHEN source_system IS NULL OR source_system NOT IN ('CO_iaxis','CO_as400') THEN 1 ELSE 0 END) AS n_source_system,
-        SUM(CASE WHEN current_record_flag IS NULL OR current_record_flag NOT IN (0,1) THEN 1 ELSE 0 END) AS n_current_record_flag,
-        SUM(CASE WHEN receipt_type IS NULL OR receipt_type NOT IN ('not-unificado','unificado-detail','unificado-total') THEN 1 ELSE 0 END) AS n_receipt_type
-    FROM base
-    GROUP BY accountable_period
-),
 exactitud_detalle AS (
     SELECT
         accountable_period,
@@ -153,9 +152,9 @@ exactitud_detalle AS (
         CASE WHEN total_registros = 0 THEN 0 ELSE ROUND(100.0 * (total_registros - cantidad_mala) / total_registros, 2) END AS porcentaje,
         0 AS es_total
     FROM (
-        SELECT accountable_period, total_registros, 'source_system' AS nombre_campo, n_source_system AS cantidad_mala FROM exactitud_agg
-        UNION ALL SELECT accountable_period, total_registros, 'current_record_flag', n_current_record_flag FROM exactitud_agg
-        UNION ALL SELECT accountable_period, total_registros, 'receipt_type', n_receipt_type FROM exactitud_agg
+        SELECT accountable_period, total_registros, 'source_system' AS nombre_campo, e_source_system AS cantidad_mala FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'current_record_flag', e_current_record_flag FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'receipt_type', e_receipt_type FROM agg_pt
     ) t
 ),
 exactitud_total AS (
@@ -172,7 +171,7 @@ exactitud_total AS (
 ),
 unicidad_llaves AS (
     SELECT accountable_period, policy_transaction_movement_sk, COUNT(*) AS cnt
-    FROM base
+    FROM base_pt
     GROUP BY accountable_period, policy_transaction_movement_sk
 ),
 unicidad_total AS (
@@ -187,35 +186,6 @@ unicidad_total AS (
     FROM unicidad_llaves
     GROUP BY accountable_period
 ),
-validez_agg AS (
-    SELECT
-        accountable_period,
-        COUNT(*) AS total_registros,
-        SUM(CASE WHEN source_system IS NULL OR source_system = 'Unknown' THEN 1 ELSE 0 END) AS n_source_system,
-        SUM(CASE WHEN coverage_code IS NULL OR coverage_code = 'Unknown' THEN 1 ELSE 0 END) AS n_coverage_code,
-        SUM(
-            CASE
-                WHEN product_code IS NULL
-                  OR product_code = 'Unknown'
-                  OR LENGTH(product_code) > 6
-                  OR product_code LIKE '% %'
-                  OR product_code ~ '[^A-Za-z0-9]'
-                  OR (source_system = 'CO_iaxis' AND product_code ~ '[A-Za-z]')
-                THEN 1 ELSE 0
-            END
-        ) AS n_product_code,
-        SUM(CASE WHEN transaction_date_sk IS NULL OR transaction_date_sk::VARCHAR !~ '^[0-9]{8}$' THEN 1 ELSE 0 END) AS n_transaction_date_sk,
-        SUM(CASE WHEN transaction_type IS NULL OR transaction_type = 'Unknown' OR LENGTH(transaction_type) > 2 THEN 1 ELSE 0 END) AS n_transaction_type,
-        SUM(CASE WHEN current_record_flag IS NULL OR current_record_flag NOT IN (0,1) THEN 1 ELSE 0 END) AS n_current_record_flag,
-        SUM(CASE WHEN risk_number IS NULL OR risk_number = 'Unknown' THEN 1 ELSE 0 END) AS n_risk_number,
-        SUM(CASE WHEN policy_number IS NULL OR policy_number = 'Unknown' THEN 1 ELSE 0 END) AS n_policy_number,
-        SUM(CASE WHEN accountable_period IS NULL OR LENGTH(accountable_period::VARCHAR) <> 6 THEN 1 ELSE 0 END) AS n_accountable_period,
-        SUM(CASE WHEN policy_effective_date_sk IS NULL OR LENGTH(policy_effective_date_sk::VARCHAR) <> 8 THEN 1 ELSE 0 END) AS n_policy_effective_date_sk,
-        SUM(CASE WHEN inception_date_sk IS NULL OR LENGTH(inception_date_sk::VARCHAR) <> 8 THEN 1 ELSE 0 END) AS n_inception_date_sk,
-        SUM(CASE WHEN transaction_effective_date_sk IS NULL OR LENGTH(transaction_effective_date_sk::VARCHAR) <> 8 THEN 1 ELSE 0 END) AS n_transaction_effective_date_sk
-    FROM base
-    GROUP BY accountable_period
-),
 validez_detalle AS (
     SELECT
         accountable_period,
@@ -226,18 +196,18 @@ validez_detalle AS (
         CASE WHEN total_registros = 0 THEN 0 ELSE ROUND(100.0 * (1 - cantidad_mala::DECIMAL / total_registros), 2) END AS porcentaje,
         0 AS es_total
     FROM (
-        SELECT accountable_period, total_registros, 'source_system' AS nombre_campo, n_source_system AS cantidad_mala FROM validez_agg
-        UNION ALL SELECT accountable_period, total_registros, 'coverage_code', n_coverage_code FROM validez_agg
-        UNION ALL SELECT accountable_period, total_registros, 'product_code', n_product_code FROM validez_agg
-        UNION ALL SELECT accountable_period, total_registros, 'transaction_date_sk', n_transaction_date_sk FROM validez_agg
-        UNION ALL SELECT accountable_period, total_registros, 'transaction_type', n_transaction_type FROM validez_agg
-        UNION ALL SELECT accountable_period, total_registros, 'current_record_flag', n_current_record_flag FROM validez_agg
-        UNION ALL SELECT accountable_period, total_registros, 'risk_number', n_risk_number FROM validez_agg
-        UNION ALL SELECT accountable_period, total_registros, 'policy_number', n_policy_number FROM validez_agg
-        UNION ALL SELECT accountable_period, total_registros, 'accountable_period', n_accountable_period FROM validez_agg
-        UNION ALL SELECT accountable_period, total_registros, 'policy_effective_date_sk', n_policy_effective_date_sk FROM validez_agg
-        UNION ALL SELECT accountable_period, total_registros, 'inception_date_sk', n_inception_date_sk FROM validez_agg
-        UNION ALL SELECT accountable_period, total_registros, 'transaction_effective_date_sk', n_transaction_effective_date_sk FROM validez_agg
+        SELECT accountable_period, total_registros, 'source_system' AS nombre_campo, v_source_system AS cantidad_mala FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'coverage_code', v_coverage_code FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'product_code', v_product_code FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'transaction_date_sk', v_transaction_date_sk FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'transaction_type', v_transaction_type FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'current_record_flag', e_current_record_flag FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'risk_number', v_risk_number FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'policy_number', v_policy_number FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'accountable_period', v_accountable_period FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'policy_effective_date_sk', v_policy_effective_date_sk FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'inception_date_sk', v_inception_date_sk FROM agg_pt
+        UNION ALL SELECT accountable_period, total_registros, 'transaction_effective_date_sk', v_transaction_effective_date_sk FROM agg_pt
     ) t
 ),
 validez_total AS (
@@ -315,7 +285,6 @@ SELECT
     tipo_indicador,
     nombre_campo,
     CASE nombre_campo
-        -- >>> AUTOGEN:nombre_natural (generado por notebooks/generar_sql.py desde dq_primas_logica.NOMBRE_NATURAL — no editar a mano) <<<
         WHEN 'source_system' THEN 'Sistema fuente'
         WHEN 'accountable_period' THEN 'Periodo contable'
         WHEN 'coverage_code' THEN 'Código de cobertura'
@@ -343,7 +312,6 @@ SELECT
         WHEN 'disponibilidad_mes' THEN 'Disponibilidad del mes (días con datos)'
         WHEN 'disponibilidad_regla4' THEN 'Disponibilidad por ramo (días 1–15)'
         ELSE nombre_campo
-        -- >>> END:nombre_natural <<<
     END AS nombre_natural,
     total_registros,
     cantidad_mala,
@@ -351,8 +319,3 @@ SELECT
     es_total,
     GETDATE() AS fecha_calculo
 FROM cubo_union;
-
--- 4) Verificación: inspeccionar el cubo persistido
-SELECT *
-FROM co_sandbox_datos.kpi_cubo_mensual
-ORDER BY periodo_contable, tipo_indicador, nombre_campo;
