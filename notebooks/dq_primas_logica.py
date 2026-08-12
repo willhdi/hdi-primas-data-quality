@@ -291,6 +291,221 @@ order by 1, 2;
 
 
 # =====================================================================
+# ALERTAS: umbrales y clasificadores (espejo de sql/10_Alertas_saldos_dimensiones.sql
+# y sql/11_KPI_Disponibilidad_hora_carga.sql). Fuente única también para el notebook.
+# =====================================================================
+# 1) Saldo diario por ramo: variación vs. día con datos anterior. Umbrales MoM ±15% / ±30%.
+UMBRAL_SALDO_ADV = 15.0
+UMBRAL_SALDO_CRIT = 30.0
+# 2) Dimensiones comparables (completitud/exactitud/unicidad/validez): <95 Adv, <90 Crít.
+UMBRAL_DIM_ADV = 95.0
+UMBRAL_DIM_CRIT = 90.0
+# 3) Disponibilidad (regla 4): banda laxa propia (valores bajos son normales).
+UMBRAL_DISP_ADV = 50.0
+UMBRAL_DISP_CRIT = 25.0
+# 4) Hora de carga: minutos respecto al corte 11:00 (<=0 a tiempo; >120 = más de 2h tarde).
+UMBRAL_CARGA_ADV_MIN = 0
+UMBRAL_CARGA_CRIT_MIN = 120
+
+
+def clasificar_saldo(variacion_pct):
+    """Estado del saldo diario por ramo según |variación %| vs. día anterior."""
+    if variacion_pct is None:
+        return 'Sin base'
+    v = abs(variacion_pct)
+    if v > UMBRAL_SALDO_CRIT:
+        return 'Crítica'
+    if v > UMBRAL_SALDO_ADV:
+        return 'Advertencia'
+    return 'Normal'
+
+
+def clasificar_dimension(porcentaje):
+    """Estado de una dimensión comparable según su % de cumplimiento."""
+    if porcentaje is None:
+        return 'Pendiente'
+    if porcentaje < UMBRAL_DIM_CRIT:
+        return 'Crítica'
+    if porcentaje < UMBRAL_DIM_ADV:
+        return 'Advertencia'
+    return 'Normal'
+
+
+def clasificar_disponibilidad(porcentaje):
+    """Estado de disponibilidad (regla 4) con su banda laxa propia."""
+    if porcentaje is None:
+        return 'Pendiente'
+    if porcentaje < UMBRAL_DISP_CRIT:
+        return 'Crítica'
+    if porcentaje < UMBRAL_DISP_ADV:
+        return 'Advertencia'
+    return 'Normal'
+
+
+def clasificar_hora_carga(minutos_vs_corte):
+    """Estado del arribo de la carga: <=0 a tiempo; hasta 2h Advertencia; más Crítica."""
+    if minutos_vs_corte is None:
+        return 'Sin dato'
+    if minutos_vs_corte <= UMBRAL_CARGA_ADV_MIN:
+        return 'Normal'
+    if minutos_vs_corte <= UMBRAL_CARGA_CRIT_MIN:
+        return 'Advertencia'
+    return 'Crítica'
+
+
+def sql_saldo_diario_ramo(dias=90):
+    """Saldo diario de prima por ramo (product_code), mismo universo que sql/07.
+    La variación vs. día anterior y el estado se calculan en pandas (LAG en el notebook).
+    Espejo del bloque 'saldo_ramo' de sql/10."""
+    return f'''
+select
+    trim(product_code)                                as ramo,
+    transaction_date_sk                               as fecha_sk,
+    sum(transaction_delta_billed_premium_amount)      as prima_dia
+from {VISTA_FUENTE}
+where current_record_flag = 1
+  and coverage_code <> 8888
+  and transaction_delta_billed_premium_amount <> 0
+  and transaction_date_sk is not null
+  and transaction_date_sk::varchar ~ '^[0-9]{{8}}$'
+  and transaction_date_sk >= cast(to_char(current_date - interval '{dias} days', 'YYYYMMDD') as integer)
+  and (
+        (source_system = 'CO_iaxis' and receipt_type not in ('unificado-total'))
+        or source_system = 'CO_as400'
+      )
+group by 1, 2
+order by 1, 2;
+'''
+
+
+def sql_hora_carga(dias=60):
+    """Arribo diario de la carga: MIN(load_ts) vs. corte 11:00 am. Espejo de sql/11.
+    Usa MIN(load_ts), NO MAX: el MAX se contamina con reprocesos/versionado SCD, que
+    corren el timestamp hacia hoy y no reflejan cuándo llegó la data del día."""
+    return f'''
+with arribo as (
+    select
+        transaction_date_sk,
+        min(load_ts) as arribo_datos,
+        count(*)     as registros
+    from {VISTA_FUENTE}
+    where load_ts is not null
+      and transaction_date_sk is not null
+      and transaction_date_sk::varchar ~ '^[0-9]{{8}}$'
+      and transaction_date_sk >= cast(to_char(current_date - interval '{dias} days', 'YYYYMMDD') as integer)
+    group by 1
+)
+select
+    transaction_date_sk,
+    cast(to_char(to_date(transaction_date_sk::varchar, 'YYYYMMDD'), 'YYYYMM') as integer) as periodo_contable,
+    arribo_datos,
+    registros,
+    datediff(minute, date_trunc('day', arribo_datos) + interval '11 hours', arribo_datos) as minutos_vs_corte
+from arribo
+order by transaction_date_sk desc;
+'''
+
+
+ESTADO_COLOR = {
+    'Crítica': '#d03b3b', 'Advertencia': '#fab219', 'Normal': '#0ca30c',
+    'Pendiente': '#898781', 'Sin base': '#898781', 'Sin dato': '#898781',
+}
+ORDEN_ESTADO = {'Crítica': 0, 'Advertencia': 1, 'Pendiente': 2, 'Sin base': 3, 'Sin dato': 3, 'Normal': 4}
+
+
+def _esc(x):
+    """Escape HTML mínimo para texto inyectado en el panel de alertas."""
+    return (str(x) if x is not None else '') \
+        .replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;')
+
+
+def construir_html_alertas(registros, generado='', fuente=''):
+    """Panel de alertas autocontenido (HTML puro, sin pandas ni JS).
+
+    `registros` = lista de dicts con las columnas de vw_alertas_primas
+    (ambito, clave, clave_natural, periodo_contable, fecha, valor,
+     valor_referencia, variacion_pct, estado, detalle).
+    Devuelve un string HTML listo para escribir a disco. Se prueba aislado."""
+    titulos = {
+        'saldo_ramo': 'Saldos diarios por ramo (±15% / ±30% vs. día anterior)',
+        'dimension': 'Dimensiones de calidad (<95% Adv · <90% Crít)',
+        'disponibilidad': 'Disponibilidad (banda laxa)',
+        'hora_carga': 'Hora de carga vs. corte 11:00 am',
+    }
+    # Semáforo: conteo por estado dentro de cada ámbito.
+    resumen = {}
+    for r in registros:
+        amb = r.get('ambito', '')
+        est = r.get('estado', '')
+        resumen.setdefault(amb, {}).setdefault(est, 0)
+        resumen[amb][est] += 1
+
+    def _chip(est, n):
+        return (f'<span class="chip" style="--c:{ESTADO_COLOR.get(est, "#898781")}">'
+                f'{_esc(est)}: <b>{n}</b></span>')
+
+    secciones = []
+    for amb in ['saldo_ramo', 'dimension', 'disponibilidad', 'hora_carga']:
+        filas = [r for r in registros if r.get('ambito') == amb]
+        if not filas:
+            continue
+        chips = ' '.join(_chip(e, resumen[amb][e])
+                         for e in sorted(resumen[amb], key=lambda e: ORDEN_ESTADO.get(e, 9)))
+        # Tabla: solo lo accionable (no Normal), lo más reciente/severo primero.
+        accion = [r for r in filas if r.get('estado') not in ('Normal',)]
+        accion.sort(key=lambda r: (ORDEN_ESTADO.get(r.get('estado'), 9),
+                                   str(r.get('fecha') or ''),), reverse=False)
+        accion = accion[:60]
+        if accion:
+            trs = []
+            for r in accion:
+                est = r.get('estado', '')
+                val = r.get('valor')
+                val_txt = '' if val is None else (f'{val:,.2f}' if isinstance(val, (int, float)) else _esc(val))
+                var = r.get('variacion_pct')
+                var_txt = '' if var is None else f'{var:+.1f}%'
+                trs.append(
+                    '<tr>'
+                    f'<td><span class="dot" style="--c:{ESTADO_COLOR.get(est, "#898781")}"></span>{_esc(est)}</td>'
+                    f'<td>{_esc(r.get("clave_natural") or r.get("clave"))}</td>'
+                    f'<td class="mono">{_esc(r.get("fecha") or r.get("periodo_contable"))}</td>'
+                    f'<td class="num">{val_txt}</td>'
+                    f'<td class="num">{var_txt}</td>'
+                    f'<td class="det">{_esc(r.get("detalle"))}</td>'
+                    '</tr>')
+            tabla = ('<table><thead><tr><th>Estado</th><th>Clave</th><th>Periodo/Fecha</th>'
+                     '<th class="num">Valor</th><th class="num">Var.</th><th>Detalle</th></tr></thead>'
+                     f'<tbody>{"".join(trs)}</tbody></table>')
+        else:
+            tabla = '<p class="ok">Sin alertas accionables — todo en Normal.</p>'
+        secciones.append(f'<section><h2>{_esc(titulos.get(amb, amb))}</h2>'
+                         f'<div class="chips">{chips}</div>{tabla}</section>')
+
+    return f'''<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alertas · CDP Primas</title>
+<style>
+  :root{{--brand:#0f7a3c;--page:#f4f4f1;--surface:#fcfcfb;--ink:#0b0b0b;--muted:#898781;--border:rgba(11,11,11,.12)}}
+  @media (prefers-color-scheme:dark){{:root{{--brand:#2fae62;--page:#0d0d0d;--surface:#1a1a19;--ink:#fff;--muted:#c3c2b7;--border:rgba(255,255,255,.12)}}}}
+  *{{box-sizing:border-box}} body{{margin:0;background:var(--page);color:var(--ink);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}}
+  .wrap{{max-width:1180px;margin:0 auto;padding:22px 24px 60px}}
+  h1{{color:var(--brand);margin:0 0 2px}} .sub{{color:var(--muted);margin:0 0 22px}}
+  section{{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin:0 0 18px}}
+  h2{{font-size:15px;margin:0 0 10px}}
+  .chips{{margin-bottom:12px}} .chip{{display:inline-block;border:1px solid var(--c);color:var(--c);border-radius:999px;padding:2px 10px;margin:0 6px 6px 0;font-size:12px}}
+  .dot{{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--c);margin-right:7px;vertical-align:middle}}
+  table{{width:100%;border-collapse:collapse;font-size:13px}} th,td{{text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);vertical-align:top}}
+  th{{color:var(--muted);font-weight:600}} .num{{text-align:right;white-space:nowrap}} .mono{{font-variant-numeric:tabular-nums;white-space:nowrap}}
+  .det{{color:var(--muted);font-size:12px}} .ok{{color:#0ca30c;margin:4px 0}}
+</style></head><body><div class="wrap">
+<h1>Alertas de Calidad · CDP Primas</h1>
+<p class="sub">Generado: {_esc(generado)} · Fuente: {_esc(fuente)} · Espejo de co_sandbox_datos.vw_alertas_primas (sql/10 + sql/11)</p>
+{''.join(secciones) if secciones else '<p>Sin datos de alertas.</p>'}
+</div></body></html>'''
+
+
+# =====================================================================
 # nombre_natural: resumen legible por nombre_campo (refleja el CASE de sql/06).
 # =====================================================================
 NOMBRE_NATURAL = {

@@ -64,5 +64,12 @@ Como perfil de **Gobierno de Datos**, tu rol frente a este proceso es:
 - [ ] Agendar sesión técnica con Juan para entender el detalle de cada query/KPI.
 - [ ] Revisar la Política de Poblamiento y Calidad de Datos con Paula.
 - [ ] Evaluar opciones de automatización de la carga de periodos (Glue u otra alternativa disponible en tu stack actual).
-- [ ] Diseñar la lógica del KPI de disponibilidad.
+- [x] Diseñar la lógica del KPI de disponibilidad. *(hecho: `sql/08` disponibilidad por días del mes + `sql/11` disponibilidad por hora de carga, corte 11am con `MIN(load_ts)`.)*
 - [ ] Validar con Viviana el estado actual de la visualización mejorada.
+
+## 5. Estado de avance (ver `docs/Hallazgos y Estado del Proyecto.md`)
+
+- **Cubo unificado** (`sql/06` → `vw_kpi_cubo_mensual`): recalcula los 5 indicadores sobre la marcha, sin periodos quemados.
+- **Alertas** (`sql/10` → `vw_alertas_primas`): saldos diarios por ramo (±15%/±30%), dimensiones de calidad (<95%/<90%), disponibilidad (banda laxa) y hora de carga, en una sola vista semáforo. Integridad aparece como `Pendiente` (sigue bloqueada). El notebook genera además el panel `reports/alertas_primas.html`.
+- **Disponibilidad por hora de carga** (`sql/11` → `vw_disponibilidad_hora_carga`): arribo diario de la carga vs. corte 11:00 am.
+- El **envío/notificación** de alertas (Power Automate u otro canal) queda pendiente; `vw_alertas_primas` es la capa base para conectarlo.

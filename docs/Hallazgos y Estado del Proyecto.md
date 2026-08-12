@@ -35,3 +35,17 @@ El catálogo de reglas (`docs/KPIs - REGLAS CALIDAD CDP Primas(Reglas KPIs Calid
 ### 3. KPI de Integridad — bloqueado
 No existe archivo para este indicador, y el catálogo de reglas tampoco tiene ninguna lógica definida en su columna de Integridad (está vacía para todos los campos). Es el sexto indicador mencionado en el alcance original (ver [README.md](../README.md)) pero nunca se llegó a definir.
 - **Qué se necesita:** la Política de Poblamiento y Calidad de Datos (la tiene Paula Torres) para poder definir qué significa "integridad" para este dataset antes de escribir cualquier SQL.
+
+---
+
+## Avance 2026-08-12 — Alertas y disponibilidad por hora de carga
+
+**Tarea 1 — Alertas de saldos + dimensiones (hecho).** Se creó `sql/10_Alertas_saldos_dimensiones.sql` → vista única `co_sandbox_datos.vw_alertas_primas` (formato largo, semáforo Normal/Advertencia/Crítica) que reúne cuatro ámbitos: `saldo_ramo` (saldo diario de prima por ramo vs. día anterior, umbrales ±15%/±30% como el MoM), `dimension` (% de cumplimiento por dimensión desde el cubo, <95%/<90%), `disponibilidad` (regla 4, banda laxa propia) y `hora_carga`. **Integridad** aparece como fila con estado `Pendiente` (no se inventa cálculo). La lógica se replicó en `dq_primas_logica.py` y el notebook exporta `reports/alertas_primas.csv` + el panel `reports/alertas_primas.html`.
+
+**Tarea 2 — Disponibilidad por hora de carga (hecho, verificado con diagnóstico).** Se creó `sql/11_KPI_Disponibilidad_hora_carga.sql` → `vw_disponibilidad_hora_carga`. Hallazgo al verificar la vista: existe la columna `load_ts` (timestamp con hora real); `transaction_accounting_ts` es contable y no sirve. **Decisión clave:** el indicador usa `MIN(load_ts)` por día, no `MAX` — el `MAX` se corre a "hoy" porque los registros viejos se reescriben en cargas posteriores (SCD/reprocesos), así que no refleja el arribo real. Con las cargas actuales de madrugada (~04:00–09:00), el SLA de las 11:00 am se cumple normalmente.
+
+**Notas de diseño (no son bugs):**
+- La banda de `disponibilidad` en `vw_alertas_primas` NO usa el 90/95 de las demás dimensiones a propósito: en regla 4 un solo día faltante condena un ramo, así que los % bajos son normales (si se aplicara 90/95 saldría casi siempre en Crítica).
+- El panel de alertas del notebook (`alertas_primas.html`) es un artefacto aparte, autocontenido; las alertas también quedan embebidas en el payload del tablero principal para futura integración a una pestaña. La integración visual dentro de la SPA de 54KB se dejó pendiente por no poder ejecutar el notebook contra Redshift en esa sesión.
+
+**Envío de alertas (Power Automate u otro canal): fuera de alcance por ahora** — `vw_alertas_primas` queda como capa base para conectarlo después.
