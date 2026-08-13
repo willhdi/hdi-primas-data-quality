@@ -1,8 +1,8 @@
--- 11_KPI_Disponibilidad_hora_carga.sql  (nuevo, aditivo — BORRADOR)
+-- 02_vw_disponibilidad_hora_carga.sql  (nuevo, aditivo — BORRADOR)
 --
 -- Disponibilidad por HORA DE CARGA (corte 11:00 am).
 --
--- Objetivo: además de "¿llegó data del mes?" (sql/08, que solo cuenta DÍAS), medir
+-- Objetivo: además de "¿llegó data del mes?" (sql/consultas/disponibilidad_mes.sql, que solo cuenta DÍAS), medir
 -- si la carga de cada día quedó lista ANTES o DESPUÉS de las 11:00 am.
 --
 -- ⚠ BLOQUEO / VERIFICAR PRIMERO ⚠

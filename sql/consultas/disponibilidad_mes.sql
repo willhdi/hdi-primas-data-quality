@@ -1,4 +1,4 @@
--- 08_KPI_Disponibilidad_mes.sql  (nuevo, aditivo)
+-- disponibilidad_mes.sql  (nuevo, aditivo)
 --
 -- Disponibilidad — variante SOLO-VISTA basada en transaction_date_sk.
 --

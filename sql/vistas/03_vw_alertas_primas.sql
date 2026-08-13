@@ -1,9 +1,9 @@
--- 10_Alertas_saldos_dimensiones.sql  (nuevo, aditivo)
+-- 03_vw_alertas_primas.sql  (nuevo, aditivo)
 --
 -- Vista única de ALERTAS del workstream Primas. Formato largo (long): un renglón
 -- por alerta, con un `estado` semáforo homogéneo (Normal / Advertencia / Crítica),
 -- para conectar directo a Power BI o a un futuro envío (Power Automate) sin más
--- transformación. NO recalcula la calidad: reutiliza vw_kpi_cubo_mensual (sql/06).
+-- transformación. NO recalcula la calidad: reutiliza vw_kpi_cubo_mensual (sql/vistas/01_vw_kpi_cubo_mensual.sql).
 --
 -- Reúne cuatro ámbitos (columna `ambito`) que NO son comparables entre sí:
 --   1) 'saldo_ramo'    — saldo diario de prima por ramo (product_code) vs. el día
@@ -15,13 +15,13 @@
 --                        propios y laxos: valores bajos son NORMALES aquí (un solo día
 --                        faltante condena un ramo), por eso NO usa la banda 90/95.
 --   4) 'hora_carga'    — arribo diario de la carga vs. el corte de las 11:00 am
---                        (desde vw_disponibilidad_hora_carga, sql/11). 'valor' = minutos
+--                        (desde vw_disponibilidad_hora_carga, sql/vistas/02_vw_disponibilidad_hora_carga.sql). 'valor' = minutos
 --                        respecto al corte (negativo = antes de las 11 = a tiempo).
 --
 -- Convenciones del repo: porcentajes 0–100; periodo_contable INTEGER YYYYMM;
 -- todo en español; se lee SOLO de la vista general + del cubo (sin tablas base).
 --
--- DEPENDENCIAS (crear en este orden): sql/06 (vw_kpi_cubo_mensual) y sql/11
+-- DEPENDENCIAS (crear en este orden): sql/vistas/01_vw_kpi_cubo_mensual.sql (vw_kpi_cubo_mensual) y sql/vistas/02_vw_disponibilidad_hora_carga.sql
 -- (vw_disponibilidad_hora_carga) deben existir ANTES de correr este archivo.
 --
 -- Consumo típico:
@@ -31,7 +31,7 @@ CREATE OR REPLACE VIEW co_sandbox_datos.vw_alertas_primas AS
 
 -- =====================================================================
 -- 1) SALDO DIARIO POR RAMO  (ámbito 'saldo_ramo')
---    Mismo universo/filtro que sql/07 (serie de primas) para que reconcilie.
+--    Mismo universo/filtro que sql/consultas/primas_monto_mensual.sql (serie de primas) para que reconcilie.
 --    "ramo" = product_code (grano nativo del hecho). Ventana: últimos ~90 días.
 -- =====================================================================
 WITH saldo_diario AS (
@@ -171,7 +171,7 @@ alertas_disponibilidad AS (
 
 -- =====================================================================
 -- 4) HORA DE CARGA vs. CORTE 11am  (ámbito 'hora_carga')
---    Arribo diario de la carga (desde vw_disponibilidad_hora_carga, sql/11).
+--    Arribo diario de la carga (desde vw_disponibilidad_hora_carga, sql/vistas/02_vw_disponibilidad_hora_carga.sql).
 --    valor = minutos respecto al corte (negativo = antes de las 11 = a tiempo).
 --    Banda: a tiempo Normal; hasta 2 h tarde Advertencia; más de 2 h Crítica.
 -- =====================================================================

@@ -22,7 +22,7 @@ barras agrupadas y el Pareto se arma con el gráfico combinado nativo.
 
 ## 0. Requisitos previos
 
-1. **El cubo debe estar poblado.** Si aún no existe, ejecuta completo `sql/06_KPI_Cubo Unificado.sql`
+1. **El cubo debe estar poblado.** Si aún no existe, ejecuta completo `sql/vistas/01_vw_kpi_cubo_mensual.sql`
    (crea tabla, SPs y vista) y luego, en el editor SQL del warehouse:
    ```sql
    CALL co_sandbox_datos.sp_kpi_cubo_auto();
