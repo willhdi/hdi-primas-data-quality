@@ -7,6 +7,7 @@ saldos diarios + LAG). Power BI se cae por **timeout** al cargarlas vía ODBC. E
 guardan el resultado de la vista para que Power BI lea algo liviano al instante. **Las
 vistas siguen siendo la fuente de la lógica**; las tablas solo copian su resultado.
 
+- `tbl_kpi_cubo_mensual.sql` — materializa `vw_kpi_cubo_mensual` → `co_sandbox_datos.tbl_kpi_cubo_mensual` (el cubo de KPIs; acelera donuts/tendencias/detalle).
 - `tbl_alertas_primas.sql` — materializa `vw_alertas_primas` → `co_sandbox_datos.tbl_alertas_primas`.
 - `tbl_disponibilidad_hora_carga.sql` — materializa `vw_disponibilidad_hora_carga` → `co_sandbox_datos.tbl_disponibilidad_hora_carga`.
 
@@ -14,9 +15,7 @@ vistas siguen siendo la fuente de la lógica**; las tablas solo copian su result
 (crea la estructura la 1ª vez) + `TRUNCATE` + `INSERT INTO ... SELECT * FROM la_vista`.
 Correrlo de nuevo = refrescar el snapshot. Hoy es manual; luego se puede agendar.
 
-**Power BI apunta a estas tablas** (`tbl_*`), NO a las vistas. El cubo
-`vw_kpi_cubo_mensual` se deja como vista (hoy carga bien); si algún día también pesa,
-se materializa igual aquí.
+**Power BI apunta a estas tablas** (`tbl_*`), NO a las vistas.
 
 ## Organización de `sql/`
 
