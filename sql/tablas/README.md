@@ -1,14 +1,22 @@
 # sql/tablas — scripts que crean TABLAS persistidas
 
-Carpeta reservada para scripts `CREATE TABLE` (objetos materializados en el warehouse).
+Scripts `CREATE TABLE` que **materializan** (snapshot) las vistas de `sql/vistas/`.
 
-**Hoy está vacía a propósito:** el diseño actual usa **vistas puras** (ver `sql/vistas/`)
-que se recalculan al consultarse, sin tablas ni procedimientos. Los KPIs originales sí
-usaban tablas + stored procedures, pero esos archivos se retiraron (recuperables desde
-el historial de git; ver `CLAUDE.md`).
+**Por qué existen:** las vistas de `sql/vistas/` recomputan al vuelo (3 años del hecho +
+saldos diarios + LAG). Power BI se cae por **timeout** al cargarlas vía ODBC. Estas tablas
+guardan el resultado de la vista para que Power BI lea algo liviano al instante. **Las
+vistas siguen siendo la fuente de la lógica**; las tablas solo copian su resultado.
 
-Si en el futuro se materializa algo (por rendimiento o para snapshots históricos),
-el `CREATE TABLE` + su carga van aquí.
+- `tbl_alertas_primas.sql` — materializa `vw_alertas_primas` → `co_sandbox_datos.tbl_alertas_primas`.
+- `tbl_disponibilidad_hora_carga.sql` — materializa `vw_disponibilidad_hora_carga` → `co_sandbox_datos.tbl_disponibilidad_hora_carga`.
+
+**Patrón (idempotente):** cada script hace `CREATE TABLE IF NOT EXISTS ... AS SELECT ... WHERE 1=0`
+(crea la estructura la 1ª vez) + `TRUNCATE` + `INSERT INTO ... SELECT * FROM la_vista`.
+Correrlo de nuevo = refrescar el snapshot. Hoy es manual; luego se puede agendar.
+
+**Power BI apunta a estas tablas** (`tbl_*`), NO a las vistas. El cubo
+`vw_kpi_cubo_mensual` se deja como vista (hoy carga bien); si algún día también pesa,
+se materializa igual aquí.
 
 ## Organización de `sql/`
 
