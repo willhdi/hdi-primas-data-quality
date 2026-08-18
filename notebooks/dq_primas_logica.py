@@ -407,8 +407,8 @@ order by transaction_date_sk desc;
 
 
 ESTADO_COLOR = {
-    'Crítica': '#d03b3b', 'Advertencia': '#fab219', 'Normal': '#0ca30c',
-    'Pendiente': '#898781', 'Sin base': '#898781', 'Sin dato': '#898781',
+    'Crítica': '#CA0018', 'Advertencia': '#F2A900', 'Normal': '#006729',
+    'Pendiente': '#919395', 'Sin base': '#919395', 'Sin dato': '#919395',
 }
 ORDEN_ESTADO = {'Crítica': 0, 'Advertencia': 1, 'Pendiente': 2, 'Sin base': 3, 'Sin dato': 3, 'Normal': 4}
 
@@ -503,6 +503,98 @@ def construir_html_alertas(registros, generado='', fuente=''):
 <p class="sub">Generado: {_esc(generado)} · Fuente: {_esc(fuente)} · Espejo de co_sandbox_datos.vw_alertas_primas (sql/10 + sql/11)</p>
 {''.join(secciones) if secciones else '<p>Sin datos de alertas.</p>'}
 </div></body></html>'''
+
+
+def construir_secciones_alertas(registros):
+    """HTML INTERNO (sin <html>/<head>) de la sección Alertas para inyectar en el
+    tablero SPA (reutiliza las clases <section>/.nota del template; colores de estado
+    = paleta HDI). `registros` = lista de dicts de vw_alertas_primas."""
+    resumen = {}
+    for r in registros:
+        est = r.get('estado', '')
+        resumen[est] = resumen.get(est, 0) + 1
+
+    def badge(est):
+        c = ESTADO_COLOR.get(est, '#919395')
+        return (f'<span style="display:inline-block;padding:2px 9px;border-radius:999px;'
+                f'background:{c};color:#fff;font-size:12px">{_esc(est)}</span>')
+
+    def num(v, dec=2):
+        try:
+            return f'{float(v):,.{dec}f}'
+        except (TypeError, ValueError):
+            return ''
+
+    def pct(v):
+        try:
+            return f'{float(v):+.1f}%'
+        except (TypeError, ValueError):
+            return ''
+
+    def tabla(filas, cols):
+        head = ''.join(f'<th style="text-align:{a};padding:6px 8px;color:var(--ink-2,#52514e);'
+                       f'border-bottom:1px solid var(--grid,#e1e0d9)">{h}</th>' for h, _, a in cols)
+        cuerpo = ''
+        for r in filas:
+            tds = ''.join(f'<td style="text-align:{a};padding:6px 8px;'
+                          f'border-bottom:1px solid var(--border,#eee)">{fn(r)}</td>' for _, fn, a in cols)
+            cuerpo += f'<tr>{tds}</tr>'
+        if not filas:
+            cuerpo = '<tr><td style="padding:8px;color:var(--muted,#898781)">Sin filas.</td></tr>'
+        return (f'<table style="width:100%;border-collapse:collapse;font-size:13px">'
+                f'<thead><tr>{head}</tr></thead><tbody>{cuerpo}</tbody></table>')
+
+    # Saldos: solo alertas (no Normal), lo más reciente primero, máx 40.
+    saldos = [r for r in registros if r.get('ambito') == 'saldo_ramo' and r.get('estado') != 'Normal']
+    saldos.sort(key=lambda r: str(r.get('fecha') or ''), reverse=True)
+    saldos = saldos[:40]
+    t_saldos = tabla(saldos, [
+        ('Estado', lambda r: badge(r.get('estado', '')), 'left'),
+        ('Ramo', lambda r: _esc(r.get('clave_natural') or r.get('clave')), 'left'),
+        ('Fecha', lambda r: _esc(r.get('fecha')), 'left'),
+        ('Prima del día', lambda r: num(r.get('valor')), 'right'),
+        ('Var. %', lambda r: pct(r.get('variacion_pct')), 'right'),
+    ])
+
+    # Dimensiones: último periodo disponible.
+    dims = [r for r in registros if r.get('ambito') == 'dimension']
+    per_max = max((r.get('periodo_contable') or 0) for r in dims) if dims else None
+    dims_u = sorted([r for r in dims if r.get('periodo_contable') == per_max],
+                    key=lambda r: _esc(r.get('clave_natural')))
+    t_dims = tabla(dims_u, [
+        ('Dimensión', lambda r: _esc(r.get('clave_natural')), 'left'),
+        ('Periodo', lambda r: _esc(r.get('periodo_contable')), 'left'),
+        ('% cumplimiento', lambda r: num(r.get('valor')), 'right'),
+        ('Estado', lambda r: badge(r.get('estado', '')), 'left'),
+    ])
+
+    # Hora de carga: reciente primero, máx 30.
+    horas = [r for r in registros if r.get('ambito') == 'hora_carga']
+    horas.sort(key=lambda r: str(r.get('fecha') or ''), reverse=True)
+    horas = horas[:30]
+    t_horas = tabla(horas, [
+        ('Fecha', lambda r: _esc(r.get('fecha')), 'left'),
+        ('Min. vs corte 11am', lambda r: num(r.get('valor'), 0), 'right'),
+        ('Estado', lambda r: badge(r.get('estado', '')), 'left'),
+        ('Detalle', lambda r: _esc(r.get('detalle')), 'left'),
+    ])
+
+    def card(titulo, n, color):
+        return (f'<section style="flex:1;text-align:center">'
+                f'<div style="font-size:34px;font-weight:700;color:{color}">{n}</div>'
+                f'<div class="nota">{titulo}</div></section>')
+
+    return (
+        f'<div style="display:flex;gap:16px;margin-bottom:16px">'
+        f'{card("Alertas críticas", resumen.get("Crítica", 0), "#CA0018")}'
+        f'{card("Alertas advertencia", resumen.get("Advertencia", 0), "#F2A900")}</div>'
+        f'<section><h2>Saldos diarios por ramo — variación vs. día anterior (±15% / ±30%)</h2>'
+        f'<p class="nota">Solo alertas (no incluye estado Normal). Máx. 40 filas, más reciente primero.</p>{t_saldos}</section>'
+        f'<section><h2>Dimensiones de calidad</h2>'
+        f'<p class="nota">Último periodo. &lt;95% advertencia, &lt;90% crítica; Integridad = pendiente.</p>{t_dims}</section>'
+        f'<section><h2>Disponibilidad por hora de carga (corte 11:00 am)</h2>'
+        f'<p class="nota">Negativo = la carga llegó antes de las 11am.</p>{t_horas}</section>'
+    )
 
 
 # =====================================================================
