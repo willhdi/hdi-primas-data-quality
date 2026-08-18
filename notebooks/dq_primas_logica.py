@@ -545,6 +545,48 @@ def nombre_natural(campo):
 
 
 # =====================================================================
+# NOMBRE_CORTO: etiqueta CORTA por campo, para ejes/tablas del tablero
+# (Power BI "Detalle por variable"). Más breve que NOMBRE_NATURAL y que la
+# descripción larga del diccionario. Se exporta a reports/nombre_natural_campos.csv.
+# =====================================================================
+NOMBRE_CORTO = {
+    'source_system': 'Sistema fuente',
+    'accountable_period': 'Periodo contable',
+    'coverage_code': 'Cobertura',
+    'branch_sk': 'Sucursal',
+    'product_code': 'Producto (ramo)',
+    'transaction_date_sk': 'Fecha movimiento',
+    'policy_effective_date_sk': 'Inicio póliza',
+    'policy_expiration_date_sk': 'Fin póliza',
+    'inception_date_sk': 'Inicio contrato',
+    'transaction_type': 'Tipo movimiento',
+    'transaction_effective_date_sk': 'Fecha efectiva mov.',
+    'transaction_type_description': 'Descripción movimiento',
+    'current_record_flag': 'Marca de vigencia',
+    'transaction_delta_billed_premium_amount': 'Prima facturada',
+    'transaction_delta_billed_premium_amount_raw': 'Prima facturada (bruta)',
+    'transaction_delta_commission_amount': 'Comisión',
+    'risk_number': 'N° de riesgo',
+    'policy_number': 'N° de póliza',
+    'policy_transaction_movement_sk': 'ID de movimiento',
+    'sseguro': 'ID de seguro',
+    'receipt_type': 'Tipo de recibo',
+    'receipt_number': 'N° de recibo',
+    # Filas agregadas / de resumen
+    'TOTAL_PERIODO': 'Total del periodo',
+    'TOTAL': 'Total del periodo',
+    'disponibilidad_mes': 'Disponibilidad del mes',
+    'disponibilidad_regla4': 'Disponibilidad por ramo',
+}
+assert set(NOMBRE_CORTO) >= set(NOMBRE_NATURAL), 'NOMBRE_CORTO le faltan campos de NOMBRE_NATURAL'
+
+
+def nombre_corto(campo):
+    """Etiqueta corta del campo; si no está mapeada, cae a NOMBRE_NATURAL y luego al técnico."""
+    return NOMBRE_CORTO.get(campo, NOMBRE_NATURAL.get(campo, campo))
+
+
+# =====================================================================
 # CATEGORIA_RAMO: agrupación de product_code en líneas de negocio
 # (refleja el CASE de categoria_ramo de sql/07). Ver reports/ramos_product_description.csv.
 # =====================================================================
