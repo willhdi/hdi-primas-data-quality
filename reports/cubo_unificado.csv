@@ -42,92 +42,92 @@
 202508,2025-08-01,validez,transaction_effective_date_sk,Fecha efectiva del movimiento,3975901,0,100.0,0
 202508,2025-08-01,validez,transaction_type,Tipo de transacción,3975901,0,100.0,0
 202508,2025-08-01,validez,TOTAL_PERIODO,Total del periodo,3975901,409,100.0,1
-202509,2025-09-01,completitud,accountable_period,Periodo contable,4703622,0,100.0,0
-202509,2025-09-01,completitud,branch_sk,Sucursal / comercial,4703622,0,100.0,0
-202509,2025-09-01,completitud,coverage_code,Código de cobertura,4703622,0,100.0,0
-202509,2025-09-01,completitud,current_record_flag,Marca de vigencia del registro,4703622,0,100.0,0
-202509,2025-09-01,completitud,inception_date_sk,Fecha de inicio del contrato,4703622,0,100.0,0
-202509,2025-09-01,completitud,policy_effective_date_sk,Fecha de efectividad de póliza,4703622,0,100.0,0
-202509,2025-09-01,completitud,policy_expiration_date_sk,Fecha de vencimiento de póliza,4703622,0,100.0,0
-202509,2025-09-01,completitud,policy_number,Número de póliza,4703622,0,100.0,0
-202509,2025-09-01,completitud,policy_transaction_movement_sk,Identificador del movimiento,4703622,0,100.0,0
-202509,2025-09-01,completitud,product_code,Código de producto (ramo),4703622,0,100.0,0
-202509,2025-09-01,completitud,receipt_number,Número de recibo,4703622,0,100.0,0
-202509,2025-09-01,completitud,receipt_type,Tipo de recibo,4703622,0,100.0,0
-202509,2025-09-01,completitud,risk_number,Número de riesgo,4703622,0,100.0,0
-202509,2025-09-01,completitud,source_system,Sistema fuente,4703622,0,100.0,0
-202509,2025-09-01,completitud,sseguro,Identificador de seguro (derivado del riesgo),4703622,0,100.0,0
-202509,2025-09-01,completitud,transaction_date_sk,Fecha del movimiento,4703622,0,100.0,0
-202509,2025-09-01,completitud,transaction_delta_billed_premium_amount,Prima facturada (monto neto),4703622,0,100.0,0
-202509,2025-09-01,completitud,transaction_delta_billed_premium_amount_raw,Prima facturada (valor bruto),4703622,0,100.0,0
-202509,2025-09-01,completitud,transaction_delta_commission_amount,Comisión del movimiento,4703622,0,100.0,0
-202509,2025-09-01,completitud,transaction_effective_date_sk,Fecha efectiva del movimiento,4703622,0,100.0,0
-202509,2025-09-01,completitud,transaction_type,Tipo de transacción,4703622,0,100.0,0
-202509,2025-09-01,completitud,transaction_type_description,Descripción del tipo de transacción,4703622,0,100.0,0
-202509,2025-09-01,completitud,TOTAL_PERIODO,Total del periodo,4703622,0,100.0,1
+202509,2025-09-01,completitud,accountable_period,Periodo contable,4703628,0,100.0,0
+202509,2025-09-01,completitud,branch_sk,Sucursal / comercial,4703628,0,100.0,0
+202509,2025-09-01,completitud,coverage_code,Código de cobertura,4703628,0,100.0,0
+202509,2025-09-01,completitud,current_record_flag,Marca de vigencia del registro,4703628,0,100.0,0
+202509,2025-09-01,completitud,inception_date_sk,Fecha de inicio del contrato,4703628,0,100.0,0
+202509,2025-09-01,completitud,policy_effective_date_sk,Fecha de efectividad de póliza,4703628,0,100.0,0
+202509,2025-09-01,completitud,policy_expiration_date_sk,Fecha de vencimiento de póliza,4703628,0,100.0,0
+202509,2025-09-01,completitud,policy_number,Número de póliza,4703628,0,100.0,0
+202509,2025-09-01,completitud,policy_transaction_movement_sk,Identificador del movimiento,4703628,0,100.0,0
+202509,2025-09-01,completitud,product_code,Código de producto (ramo),4703628,0,100.0,0
+202509,2025-09-01,completitud,receipt_number,Número de recibo,4703628,0,100.0,0
+202509,2025-09-01,completitud,receipt_type,Tipo de recibo,4703628,0,100.0,0
+202509,2025-09-01,completitud,risk_number,Número de riesgo,4703628,0,100.0,0
+202509,2025-09-01,completitud,source_system,Sistema fuente,4703628,0,100.0,0
+202509,2025-09-01,completitud,sseguro,Identificador de seguro (derivado del riesgo),4703628,0,100.0,0
+202509,2025-09-01,completitud,transaction_date_sk,Fecha del movimiento,4703628,0,100.0,0
+202509,2025-09-01,completitud,transaction_delta_billed_premium_amount,Prima facturada (monto neto),4703628,0,100.0,0
+202509,2025-09-01,completitud,transaction_delta_billed_premium_amount_raw,Prima facturada (valor bruto),4703628,0,100.0,0
+202509,2025-09-01,completitud,transaction_delta_commission_amount,Comisión del movimiento,4703628,0,100.0,0
+202509,2025-09-01,completitud,transaction_effective_date_sk,Fecha efectiva del movimiento,4703628,0,100.0,0
+202509,2025-09-01,completitud,transaction_type,Tipo de transacción,4703628,0,100.0,0
+202509,2025-09-01,completitud,transaction_type_description,Descripción del tipo de transacción,4703628,0,100.0,0
+202509,2025-09-01,completitud,TOTAL_PERIODO,Total del periodo,4703628,0,100.0,1
 202509,2025-09-01,disponibilidad,disponibilidad_mes,Disponibilidad del mes (días con datos),30,0,100.0,1
 202509,2025-09-01,disponibilidad,disponibilidad_regla4,Disponibilidad por ramo (días 1–15),88,79,10.23,1
-202509,2025-09-01,exactitud,current_record_flag,Marca de vigencia del registro,4703622,0,100.0,0
-202509,2025-09-01,exactitud,receipt_type,Tipo de recibo,4703622,330358,92.98,0
-202509,2025-09-01,exactitud,source_system,Sistema fuente,4703622,0,100.0,0
-202509,2025-09-01,exactitud,TOTAL,Total del periodo,4703622,330358,97.66,1
-202509,2025-09-01,unicidad,policy_transaction_movement_sk,Identificador del movimiento,4703622,0,100.0,1
-202509,2025-09-01,validez,accountable_period,Periodo contable,4703622,0,100.0,0
-202509,2025-09-01,validez,coverage_code,Código de cobertura,4703622,502,99.99,0
-202509,2025-09-01,validez,current_record_flag,Marca de vigencia del registro,4703622,0,100.0,0
-202509,2025-09-01,validez,inception_date_sk,Fecha de inicio del contrato,4703622,211,100.0,0
-202509,2025-09-01,validez,policy_effective_date_sk,Fecha de efectividad de póliza,4703622,211,100.0,0
-202509,2025-09-01,validez,policy_number,Número de póliza,4703622,211,100.0,0
-202509,2025-09-01,validez,product_code,Código de producto (ramo),4703622,0,100.0,0
-202509,2025-09-01,validez,risk_number,Número de riesgo,4703622,0,100.0,0
-202509,2025-09-01,validez,source_system,Sistema fuente,4703622,0,100.0,0
-202509,2025-09-01,validez,transaction_date_sk,Fecha del movimiento,4703622,0,100.0,0
-202509,2025-09-01,validez,transaction_effective_date_sk,Fecha efectiva del movimiento,4703622,0,100.0,0
-202509,2025-09-01,validez,transaction_type,Tipo de transacción,4703622,0,100.0,0
-202509,2025-09-01,validez,TOTAL_PERIODO,Total del periodo,4703622,1135,100.0,1
-202510,2025-10-01,completitud,accountable_period,Periodo contable,4926896,0,100.0,0
-202510,2025-10-01,completitud,branch_sk,Sucursal / comercial,4926896,0,100.0,0
-202510,2025-10-01,completitud,coverage_code,Código de cobertura,4926896,0,100.0,0
-202510,2025-10-01,completitud,current_record_flag,Marca de vigencia del registro,4926896,0,100.0,0
-202510,2025-10-01,completitud,inception_date_sk,Fecha de inicio del contrato,4926896,0,100.0,0
-202510,2025-10-01,completitud,policy_effective_date_sk,Fecha de efectividad de póliza,4926896,0,100.0,0
-202510,2025-10-01,completitud,policy_expiration_date_sk,Fecha de vencimiento de póliza,4926896,0,100.0,0
-202510,2025-10-01,completitud,policy_number,Número de póliza,4926896,0,100.0,0
-202510,2025-10-01,completitud,policy_transaction_movement_sk,Identificador del movimiento,4926896,0,100.0,0
-202510,2025-10-01,completitud,product_code,Código de producto (ramo),4926896,0,100.0,0
-202510,2025-10-01,completitud,receipt_number,Número de recibo,4926896,0,100.0,0
-202510,2025-10-01,completitud,receipt_type,Tipo de recibo,4926896,0,100.0,0
-202510,2025-10-01,completitud,risk_number,Número de riesgo,4926896,0,100.0,0
-202510,2025-10-01,completitud,source_system,Sistema fuente,4926896,0,100.0,0
-202510,2025-10-01,completitud,sseguro,Identificador de seguro (derivado del riesgo),4926896,0,100.0,0
-202510,2025-10-01,completitud,transaction_date_sk,Fecha del movimiento,4926896,0,100.0,0
-202510,2025-10-01,completitud,transaction_delta_billed_premium_amount,Prima facturada (monto neto),4926896,0,100.0,0
-202510,2025-10-01,completitud,transaction_delta_billed_premium_amount_raw,Prima facturada (valor bruto),4926896,0,100.0,0
-202510,2025-10-01,completitud,transaction_delta_commission_amount,Comisión del movimiento,4926896,0,100.0,0
-202510,2025-10-01,completitud,transaction_effective_date_sk,Fecha efectiva del movimiento,4926896,0,100.0,0
-202510,2025-10-01,completitud,transaction_type,Tipo de transacción,4926896,0,100.0,0
-202510,2025-10-01,completitud,transaction_type_description,Descripción del tipo de transacción,4926896,0,100.0,0
-202510,2025-10-01,completitud,TOTAL_PERIODO,Total del periodo,4926896,0,100.0,1
+202509,2025-09-01,exactitud,current_record_flag,Marca de vigencia del registro,4703628,0,100.0,0
+202509,2025-09-01,exactitud,receipt_type,Tipo de recibo,4703628,330358,92.98,0
+202509,2025-09-01,exactitud,source_system,Sistema fuente,4703628,0,100.0,0
+202509,2025-09-01,exactitud,TOTAL,Total del periodo,4703628,330358,97.66,1
+202509,2025-09-01,unicidad,policy_transaction_movement_sk,Identificador del movimiento,4703628,0,100.0,1
+202509,2025-09-01,validez,accountable_period,Periodo contable,4703628,0,100.0,0
+202509,2025-09-01,validez,coverage_code,Código de cobertura,4703628,502,99.99,0
+202509,2025-09-01,validez,current_record_flag,Marca de vigencia del registro,4703628,0,100.0,0
+202509,2025-09-01,validez,inception_date_sk,Fecha de inicio del contrato,4703628,211,100.0,0
+202509,2025-09-01,validez,policy_effective_date_sk,Fecha de efectividad de póliza,4703628,211,100.0,0
+202509,2025-09-01,validez,policy_number,Número de póliza,4703628,211,100.0,0
+202509,2025-09-01,validez,product_code,Código de producto (ramo),4703628,0,100.0,0
+202509,2025-09-01,validez,risk_number,Número de riesgo,4703628,0,100.0,0
+202509,2025-09-01,validez,source_system,Sistema fuente,4703628,0,100.0,0
+202509,2025-09-01,validez,transaction_date_sk,Fecha del movimiento,4703628,0,100.0,0
+202509,2025-09-01,validez,transaction_effective_date_sk,Fecha efectiva del movimiento,4703628,0,100.0,0
+202509,2025-09-01,validez,transaction_type,Tipo de transacción,4703628,0,100.0,0
+202509,2025-09-01,validez,TOTAL_PERIODO,Total del periodo,4703628,1135,100.0,1
+202510,2025-10-01,completitud,accountable_period,Periodo contable,4926890,0,100.0,0
+202510,2025-10-01,completitud,branch_sk,Sucursal / comercial,4926890,0,100.0,0
+202510,2025-10-01,completitud,coverage_code,Código de cobertura,4926890,0,100.0,0
+202510,2025-10-01,completitud,current_record_flag,Marca de vigencia del registro,4926890,0,100.0,0
+202510,2025-10-01,completitud,inception_date_sk,Fecha de inicio del contrato,4926890,0,100.0,0
+202510,2025-10-01,completitud,policy_effective_date_sk,Fecha de efectividad de póliza,4926890,0,100.0,0
+202510,2025-10-01,completitud,policy_expiration_date_sk,Fecha de vencimiento de póliza,4926890,0,100.0,0
+202510,2025-10-01,completitud,policy_number,Número de póliza,4926890,0,100.0,0
+202510,2025-10-01,completitud,policy_transaction_movement_sk,Identificador del movimiento,4926890,0,100.0,0
+202510,2025-10-01,completitud,product_code,Código de producto (ramo),4926890,0,100.0,0
+202510,2025-10-01,completitud,receipt_number,Número de recibo,4926890,0,100.0,0
+202510,2025-10-01,completitud,receipt_type,Tipo de recibo,4926890,0,100.0,0
+202510,2025-10-01,completitud,risk_number,Número de riesgo,4926890,0,100.0,0
+202510,2025-10-01,completitud,source_system,Sistema fuente,4926890,0,100.0,0
+202510,2025-10-01,completitud,sseguro,Identificador de seguro (derivado del riesgo),4926890,0,100.0,0
+202510,2025-10-01,completitud,transaction_date_sk,Fecha del movimiento,4926890,0,100.0,0
+202510,2025-10-01,completitud,transaction_delta_billed_premium_amount,Prima facturada (monto neto),4926890,0,100.0,0
+202510,2025-10-01,completitud,transaction_delta_billed_premium_amount_raw,Prima facturada (valor bruto),4926890,0,100.0,0
+202510,2025-10-01,completitud,transaction_delta_commission_amount,Comisión del movimiento,4926890,0,100.0,0
+202510,2025-10-01,completitud,transaction_effective_date_sk,Fecha efectiva del movimiento,4926890,0,100.0,0
+202510,2025-10-01,completitud,transaction_type,Tipo de transacción,4926890,0,100.0,0
+202510,2025-10-01,completitud,transaction_type_description,Descripción del tipo de transacción,4926890,0,100.0,0
+202510,2025-10-01,completitud,TOTAL_PERIODO,Total del periodo,4926890,0,100.0,1
 202510,2025-10-01,disponibilidad,disponibilidad_mes,Disponibilidad del mes (días con datos),31,0,100.0,1
 202510,2025-10-01,disponibilidad,disponibilidad_regla4,Disponibilidad por ramo (días 1–15),85,80,5.88,1
-202510,2025-10-01,exactitud,current_record_flag,Marca de vigencia del registro,4926896,0,100.0,0
-202510,2025-10-01,exactitud,receipt_type,Tipo de recibo,4926896,320781,93.49,0
-202510,2025-10-01,exactitud,source_system,Sistema fuente,4926896,0,100.0,0
-202510,2025-10-01,exactitud,TOTAL,Total del periodo,4926896,320781,97.83,1
-202510,2025-10-01,unicidad,policy_transaction_movement_sk,Identificador del movimiento,4926896,0,100.0,1
-202510,2025-10-01,validez,accountable_period,Periodo contable,4926896,0,100.0,0
-202510,2025-10-01,validez,coverage_code,Código de cobertura,4926896,395,99.99,0
-202510,2025-10-01,validez,current_record_flag,Marca de vigencia del registro,4926896,0,100.0,0
-202510,2025-10-01,validez,inception_date_sk,Fecha de inicio del contrato,4926896,0,100.0,0
-202510,2025-10-01,validez,policy_effective_date_sk,Fecha de efectividad de póliza,4926896,0,100.0,0
-202510,2025-10-01,validez,policy_number,Número de póliza,4926896,0,100.0,0
-202510,2025-10-01,validez,product_code,Código de producto (ramo),4926896,0,100.0,0
-202510,2025-10-01,validez,risk_number,Número de riesgo,4926896,0,100.0,0
-202510,2025-10-01,validez,source_system,Sistema fuente,4926896,0,100.0,0
-202510,2025-10-01,validez,transaction_date_sk,Fecha del movimiento,4926896,0,100.0,0
-202510,2025-10-01,validez,transaction_effective_date_sk,Fecha efectiva del movimiento,4926896,0,100.0,0
-202510,2025-10-01,validez,transaction_type,Tipo de transacción,4926896,0,100.0,0
-202510,2025-10-01,validez,TOTAL_PERIODO,Total del periodo,4926896,395,100.0,1
+202510,2025-10-01,exactitud,current_record_flag,Marca de vigencia del registro,4926890,0,100.0,0
+202510,2025-10-01,exactitud,receipt_type,Tipo de recibo,4926890,320781,93.49,0
+202510,2025-10-01,exactitud,source_system,Sistema fuente,4926890,0,100.0,0
+202510,2025-10-01,exactitud,TOTAL,Total del periodo,4926890,320781,97.83,1
+202510,2025-10-01,unicidad,policy_transaction_movement_sk,Identificador del movimiento,4926890,0,100.0,1
+202510,2025-10-01,validez,accountable_period,Periodo contable,4926890,0,100.0,0
+202510,2025-10-01,validez,coverage_code,Código de cobertura,4926890,395,99.99,0
+202510,2025-10-01,validez,current_record_flag,Marca de vigencia del registro,4926890,0,100.0,0
+202510,2025-10-01,validez,inception_date_sk,Fecha de inicio del contrato,4926890,0,100.0,0
+202510,2025-10-01,validez,policy_effective_date_sk,Fecha de efectividad de póliza,4926890,0,100.0,0
+202510,2025-10-01,validez,policy_number,Número de póliza,4926890,0,100.0,0
+202510,2025-10-01,validez,product_code,Código de producto (ramo),4926890,0,100.0,0
+202510,2025-10-01,validez,risk_number,Número de riesgo,4926890,0,100.0,0
+202510,2025-10-01,validez,source_system,Sistema fuente,4926890,0,100.0,0
+202510,2025-10-01,validez,transaction_date_sk,Fecha del movimiento,4926890,0,100.0,0
+202510,2025-10-01,validez,transaction_effective_date_sk,Fecha efectiva del movimiento,4926890,0,100.0,0
+202510,2025-10-01,validez,transaction_type,Tipo de transacción,4926890,0,100.0,0
+202510,2025-10-01,validez,TOTAL_PERIODO,Total del periodo,4926890,395,100.0,1
 202511,2025-11-01,completitud,accountable_period,Periodo contable,4790756,0,100.0,0
 202511,2025-11-01,completitud,branch_sk,Sucursal / comercial,4790756,0,100.0,0
 202511,2025-11-01,completitud,coverage_code,Código de cobertura,4790756,0,100.0,0
@@ -515,46 +515,46 @@
 202607,2026-07-01,validez,transaction_effective_date_sk,Fecha efectiva del movimiento,5009928,0,100.0,0
 202607,2026-07-01,validez,transaction_type,Tipo de transacción,5009928,0,100.0,0
 202607,2026-07-01,validez,TOTAL_PERIODO,Total del periodo,5009928,347,100.0,1
-202608,2026-08-01,completitud,accountable_period,Periodo contable,3066385,0,100.0,0
-202608,2026-08-01,completitud,branch_sk,Sucursal / comercial,3066385,0,100.0,0
-202608,2026-08-01,completitud,coverage_code,Código de cobertura,3066385,0,100.0,0
-202608,2026-08-01,completitud,current_record_flag,Marca de vigencia del registro,3066385,0,100.0,0
-202608,2026-08-01,completitud,inception_date_sk,Fecha de inicio del contrato,3066385,0,100.0,0
-202608,2026-08-01,completitud,policy_effective_date_sk,Fecha de efectividad de póliza,3066385,0,100.0,0
-202608,2026-08-01,completitud,policy_expiration_date_sk,Fecha de vencimiento de póliza,3066385,0,100.0,0
-202608,2026-08-01,completitud,policy_number,Número de póliza,3066385,0,100.0,0
-202608,2026-08-01,completitud,policy_transaction_movement_sk,Identificador del movimiento,3066385,0,100.0,0
-202608,2026-08-01,completitud,product_code,Código de producto (ramo),3066385,0,100.0,0
-202608,2026-08-01,completitud,receipt_number,Número de recibo,3066385,0,100.0,0
-202608,2026-08-01,completitud,receipt_type,Tipo de recibo,3066385,0,100.0,0
-202608,2026-08-01,completitud,risk_number,Número de riesgo,3066385,0,100.0,0
-202608,2026-08-01,completitud,source_system,Sistema fuente,3066385,0,100.0,0
-202608,2026-08-01,completitud,sseguro,Identificador de seguro (derivado del riesgo),3066385,0,100.0,0
-202608,2026-08-01,completitud,transaction_date_sk,Fecha del movimiento,3066385,0,100.0,0
-202608,2026-08-01,completitud,transaction_delta_billed_premium_amount,Prima facturada (monto neto),3066385,0,100.0,0
-202608,2026-08-01,completitud,transaction_delta_billed_premium_amount_raw,Prima facturada (valor bruto),3066385,0,100.0,0
-202608,2026-08-01,completitud,transaction_delta_commission_amount,Comisión del movimiento,3066385,0,100.0,0
-202608,2026-08-01,completitud,transaction_effective_date_sk,Fecha efectiva del movimiento,3066385,0,100.0,0
-202608,2026-08-01,completitud,transaction_type,Tipo de transacción,3066385,0,100.0,0
-202608,2026-08-01,completitud,transaction_type_description,Descripción del tipo de transacción,3066385,0,100.0,0
-202608,2026-08-01,completitud,TOTAL_PERIODO,Total del periodo,3066385,0,100.0,1
-202608,2026-08-01,disponibilidad,disponibilidad_mes,Disponibilidad del mes (días con datos),11,0,100.0,1
-202608,2026-08-01,disponibilidad,disponibilidad_regla4,Disponibilidad por ramo (días 1–15),67,62,7.46,1
-202608,2026-08-01,exactitud,current_record_flag,Marca de vigencia del registro,3066385,0,100.0,0
-202608,2026-08-01,exactitud,receipt_type,Tipo de recibo,3066385,50855,98.34,0
-202608,2026-08-01,exactitud,source_system,Sistema fuente,3066385,0,100.0,0
-202608,2026-08-01,exactitud,TOTAL,Total del periodo,3066385,50855,99.45,1
-202608,2026-08-01,unicidad,policy_transaction_movement_sk,Identificador del movimiento,3066385,0,100.0,1
-202608,2026-08-01,validez,accountable_period,Periodo contable,3066385,0,100.0,0
-202608,2026-08-01,validez,coverage_code,Código de cobertura,3066385,114,100.0,0
-202608,2026-08-01,validez,current_record_flag,Marca de vigencia del registro,3066385,0,100.0,0
-202608,2026-08-01,validez,inception_date_sk,Fecha de inicio del contrato,3066385,0,100.0,0
-202608,2026-08-01,validez,policy_effective_date_sk,Fecha de efectividad de póliza,3066385,0,100.0,0
-202608,2026-08-01,validez,policy_number,Número de póliza,3066385,0,100.0,0
-202608,2026-08-01,validez,product_code,Código de producto (ramo),3066385,0,100.0,0
-202608,2026-08-01,validez,risk_number,Número de riesgo,3066385,0,100.0,0
-202608,2026-08-01,validez,source_system,Sistema fuente,3066385,0,100.0,0
-202608,2026-08-01,validez,transaction_date_sk,Fecha del movimiento,3066385,0,100.0,0
-202608,2026-08-01,validez,transaction_effective_date_sk,Fecha efectiva del movimiento,3066385,0,100.0,0
-202608,2026-08-01,validez,transaction_type,Tipo de transacción,3066385,0,100.0,0
-202608,2026-08-01,validez,TOTAL_PERIODO,Total del periodo,3066385,114,100.0,1
+202608,2026-08-01,completitud,accountable_period,Periodo contable,3625509,0,100.0,0
+202608,2026-08-01,completitud,branch_sk,Sucursal / comercial,3625509,0,100.0,0
+202608,2026-08-01,completitud,coverage_code,Código de cobertura,3625509,0,100.0,0
+202608,2026-08-01,completitud,current_record_flag,Marca de vigencia del registro,3625509,0,100.0,0
+202608,2026-08-01,completitud,inception_date_sk,Fecha de inicio del contrato,3625509,0,100.0,0
+202608,2026-08-01,completitud,policy_effective_date_sk,Fecha de efectividad de póliza,3625509,0,100.0,0
+202608,2026-08-01,completitud,policy_expiration_date_sk,Fecha de vencimiento de póliza,3625509,0,100.0,0
+202608,2026-08-01,completitud,policy_number,Número de póliza,3625509,0,100.0,0
+202608,2026-08-01,completitud,policy_transaction_movement_sk,Identificador del movimiento,3625509,0,100.0,0
+202608,2026-08-01,completitud,product_code,Código de producto (ramo),3625509,0,100.0,0
+202608,2026-08-01,completitud,receipt_number,Número de recibo,3625509,0,100.0,0
+202608,2026-08-01,completitud,receipt_type,Tipo de recibo,3625509,0,100.0,0
+202608,2026-08-01,completitud,risk_number,Número de riesgo,3625509,0,100.0,0
+202608,2026-08-01,completitud,source_system,Sistema fuente,3625509,0,100.0,0
+202608,2026-08-01,completitud,sseguro,Identificador de seguro (derivado del riesgo),3625509,0,100.0,0
+202608,2026-08-01,completitud,transaction_date_sk,Fecha del movimiento,3625509,0,100.0,0
+202608,2026-08-01,completitud,transaction_delta_billed_premium_amount,Prima facturada (monto neto),3625509,0,100.0,0
+202608,2026-08-01,completitud,transaction_delta_billed_premium_amount_raw,Prima facturada (valor bruto),3625509,0,100.0,0
+202608,2026-08-01,completitud,transaction_delta_commission_amount,Comisión del movimiento,3625509,0,100.0,0
+202608,2026-08-01,completitud,transaction_effective_date_sk,Fecha efectiva del movimiento,3625509,0,100.0,0
+202608,2026-08-01,completitud,transaction_type,Tipo de transacción,3625509,0,100.0,0
+202608,2026-08-01,completitud,transaction_type_description,Descripción del tipo de transacción,3625509,0,100.0,0
+202608,2026-08-01,completitud,TOTAL_PERIODO,Total del periodo,3625509,0,100.0,1
+202608,2026-08-01,disponibilidad,disponibilidad_mes,Disponibilidad del mes (días con datos),17,0,100.0,1
+202608,2026-08-01,disponibilidad,disponibilidad_regla4,Disponibilidad por ramo (días 1–15),73,68,6.85,1
+202608,2026-08-01,exactitud,current_record_flag,Marca de vigencia del registro,3625509,0,100.0,0
+202608,2026-08-01,exactitud,receipt_type,Tipo de recibo,3625509,291815,91.95,0
+202608,2026-08-01,exactitud,source_system,Sistema fuente,3625509,0,100.0,0
+202608,2026-08-01,exactitud,TOTAL,Total del periodo,3625509,291815,97.32,1
+202608,2026-08-01,unicidad,policy_transaction_movement_sk,Identificador del movimiento,3625509,0,100.0,1
+202608,2026-08-01,validez,accountable_period,Periodo contable,3625509,0,100.0,0
+202608,2026-08-01,validez,coverage_code,Código de cobertura,3625509,155,100.0,0
+202608,2026-08-01,validez,current_record_flag,Marca de vigencia del registro,3625509,0,100.0,0
+202608,2026-08-01,validez,inception_date_sk,Fecha de inicio del contrato,3625509,0,100.0,0
+202608,2026-08-01,validez,policy_effective_date_sk,Fecha de efectividad de póliza,3625509,0,100.0,0
+202608,2026-08-01,validez,policy_number,Número de póliza,3625509,0,100.0,0
+202608,2026-08-01,validez,product_code,Código de producto (ramo),3625509,0,100.0,0
+202608,2026-08-01,validez,risk_number,Número de riesgo,3625509,0,100.0,0
+202608,2026-08-01,validez,source_system,Sistema fuente,3625509,0,100.0,0
+202608,2026-08-01,validez,transaction_date_sk,Fecha del movimiento,3625509,0,100.0,0
+202608,2026-08-01,validez,transaction_effective_date_sk,Fecha efectiva del movimiento,3625509,0,100.0,0
+202608,2026-08-01,validez,transaction_type,Tipo de transacción,3625509,0,100.0,0
+202608,2026-08-01,validez,TOTAL_PERIODO,Total del periodo,3625509,155,100.0,1
