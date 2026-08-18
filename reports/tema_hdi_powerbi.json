@@ -1,19 +1,19 @@
 {
-  "name": "HDI Calidad de Datos",
-  "dataColors": ["#2a78d6", "#eda100", "#4a3aa7", "#eb6834", "#0f7a3c", "#8dc63f"],
-  "background": "#fcfcfb",
+  "name": "HDI Seguros - Calidad de Datos",
+  "dataColors": ["#006729", "#31CDCF", "#919395", "#CA0018", "#F2A900", "#5A5C5E"],
+  "background": "#FFFFFF",
   "foreground": "#0b0b0b",
-  "tableAccent": "#0f7a3c",
-  "good": "#0ca30c",
-  "neutral": "#fab219",
-  "bad": "#d03b3b",
-  "maximum": "#0ca30c",
-  "center": "#fab219",
-  "minimum": "#d03b3b",
+  "tableAccent": "#006729",
+  "good": "#006729",
+  "neutral": "#F2A900",
+  "bad": "#CA0018",
+  "maximum": "#006729",
+  "center": "#F2A900",
+  "minimum": "#CA0018",
   "visualStyles": {
     "*": {
       "*": {
-        "background": [{ "color": { "solid": { "color": "#fcfcfb" } } }],
+        "background": [{ "color": { "solid": { "color": "#FFFFFF" } } }],
         "border": [{ "color": { "solid": { "color": "#e1e0d9" } }, "show": true }]
       }
     }
